@@ -1,4 +1,5 @@
-﻿using AspNetCoreRateLimit;
+﻿using System;
+using AspNetCoreRateLimit;
 using Hive.Plugins;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -27,8 +28,19 @@ namespace Hive.RateLimiting
                 .AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
         }
 
-        public static void Configure(IApplicationBuilder app)
+        public static async void Configure(IApplicationBuilder app)
         {
+            if (app is null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
+            var ipPolicyStore = app.ApplicationServices.GetService<IIpPolicyStore>();
+            if (ipPolicyStore != null) await ipPolicyStore.SeedAsync().ConfigureAwait(false);
+
+            var clientPolicyStore = app.ApplicationServices.GetService<IClientPolicyStore>();
+            if (clientPolicyStore != null) await clientPolicyStore.SeedAsync().ConfigureAwait(false);
+
             _ = app.UseClientRateLimiting()
                 .UseIpRateLimiting();
         }
