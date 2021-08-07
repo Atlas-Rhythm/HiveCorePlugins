@@ -2,11 +2,9 @@
 using Hive.Utilities;
 using NodaTime;
 using Serilog;
-using System.Reflection;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System;
 
 namespace Hive.FileSystemRuleProvider
 {
@@ -38,15 +36,7 @@ namespace Hive.FileSystemRuleProvider
             this.logger = logger;
             this.splitToken = splitToken;
 
-            var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            if (assemblyLocation is null)
-            {
-                // what the fuck? this should not happen
-                throw new InvalidOperationException("The directory containing the executing Hive.dll file was somehow null.");
-            }
-
-            ruleDirectory = Path.Combine(assemblyLocation, ruleSubfolder);
+            ruleDirectory = Path.Combine(Directory.GetCurrentDirectory(), ruleSubfolder);
 
             _ = Directory.CreateDirectory(ruleSubfolder);
         }
