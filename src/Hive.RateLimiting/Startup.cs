@@ -28,7 +28,7 @@ namespace Hive.RateLimiting
                 .AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
         }
 
-        public static async void Configure(IApplicationBuilder app)
+        public static async void PreConfigureAsync(IApplicationBuilder app)
         {
             if (app is null)
             {
@@ -36,11 +36,20 @@ namespace Hive.RateLimiting
             }
 
             var ipPolicyStore = app.ApplicationServices.GetService<IIpPolicyStore>();
-            if (ipPolicyStore != null) await ipPolicyStore.SeedAsync().ConfigureAwait(false);
+            if (ipPolicyStore is not null)
+            {
+                await ipPolicyStore.SeedAsync().ConfigureAwait(false);
+            }
 
             var clientPolicyStore = app.ApplicationServices.GetService<IClientPolicyStore>();
-            if (clientPolicyStore != null) await clientPolicyStore.SeedAsync().ConfigureAwait(false);
+            if (clientPolicyStore is not null)
+            {
+                await clientPolicyStore.SeedAsync().ConfigureAwait(false);
+            }
+        }
 
+        public static void Configure(IApplicationBuilder app)
+        {
             _ = app.UseClientRateLimiting()
                 .UseIpRateLimiting();
         }
