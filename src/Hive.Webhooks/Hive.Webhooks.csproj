@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Hive.Plugin.Sdk" Version="0.1.0-dev.local.3" />
+
+  <PropertyGroup>
+
+  </PropertyGroup>
+  
+</Project>
