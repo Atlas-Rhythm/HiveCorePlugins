@@ -1,4 +1,5 @@
 ﻿using Hive.Plugins;
+using Hive.Webhooks.ServiceControllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,9 @@ namespace Hive.Webhooks
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // TODO: Register your services to the IServiceCollection
+            _ = services
+                .AddSingleton<WebhookChannelController>()
+                .AddSingleton<WebhookGameVersionController>();
         }
 
         public /*async Task*/ void PreConfigure/*Async*/()
