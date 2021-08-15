@@ -14,9 +14,9 @@ Permission rules are stored in the Hive installation folder, in the subfolder de
 
 Each rule's definition is stored as a `.rule` file inside this subfolder. To determine a rule's location on the file system, the plugin breaks the action into its individual identifiers. The *last* identifier will always be used as the file name, and all preceding identifiers will be used as additional subfolders for more organization. Here are a couple of examples:
 - `hive` -> `hive.rule`
-- `hive.mod` -> `hive\mod.rule`
-- `hive.mod.edit` -> `hive\mod\edit.rule`
-- `hive.mod.additionalData` -> `hive\mod\additionalData.rule`
+- `hive.mod` -> `hive/mod.rule`
+- `hive.mod.edit` -> `hive/mod/edit.rule`
+- `hive.mod.additionalData` -> `hive/mod/additionalData.rule`
 
 When all of these rules are put together, the file structure would look like such:
 
