@@ -1,5 +1,4 @@
 ﻿using Hive.Plugins;
-using Hive.Webhooks.ServiceControllers;
 using Hive.Webhooks.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,8 +18,7 @@ namespace Hive.Webhooks
         public void ConfigureServices(IServiceCollection services)
         {
             _ = services
-                .AddSingleton<WebhookChannelController>()
-                .AddSingleton<WebhookGameVersionController>();
+                .AddSingleton<HookEmitter>();
 
             _ = services.Configure<WebhookSettings>(Configuration.GetSection(nameof(Webhooks)));
         }
