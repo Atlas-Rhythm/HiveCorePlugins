@@ -1,4 +1,6 @@
 ﻿using Hive.Plugins;
+using Hive.Services.Common;
+using Hive.Webhooks.Discord;
 using Hive.Webhooks.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,7 +20,9 @@ namespace Hive.Webhooks
         public void ConfigureServices(IServiceCollection services)
         {
             _ = services
-                .AddSingleton<HookEmitter>();
+                .AddSingleton<IGameVersionsPlugin, HookEmitter>()
+                .AddSingleton<IChannelsControllerPlugin, HookEmitter>()
+                .AddSingleton<IHookConverter, DiscordHookConverter>();
 
             _ = services.Configure<WebhookSettings>(Configuration.GetSection(nameof(Webhooks)));
         }
