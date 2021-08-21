@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Hive.Models;
 
 namespace Hive.Webhooks.Discord
@@ -13,7 +9,17 @@ namespace Hive.Webhooks.Discord
 
         public object? ChannelCreated(Channel channel)
         {
-            return null;
+            if (channel is null)
+                throw new ArgumentNullException(nameof(channel));
+
+            DiscordEmbed embed = new()
+            {
+                Title = "New Channel Created"
+            };
+            embed.Fields.Add(new("Name", channel.Name));
+
+            DiscordWebhook webhook = new(embed);
+            return webhook;
         }
     }
 }

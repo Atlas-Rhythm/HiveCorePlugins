@@ -19,7 +19,7 @@ namespace Hive.Webhooks.Discord
         public DiscordProvider? Provider { get; set; }
 #pragma warning disable CA1002 // Do not expose generic lists
 #pragma warning disable CA2227 // Collection properties should be read only
-        public List<DiscordField>? Fields { get; set; }
+        public List<DiscordField> Fields { get; set; } = new();
 #pragma warning restore CA2227 // Collection properties should be read only
 #pragma warning restore CA1002 // Do not expose generic lists
     }
@@ -40,6 +40,12 @@ namespace Hive.Webhooks.Discord
         public string Name { get; set; } = null!;
         public string Value { get; set; } = null!;
         public bool? Inline { get; set; }
+
+        public DiscordField(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
     }
 
     public class DiscordMedia
