@@ -22,7 +22,9 @@ namespace Hive.Webhooks.Discord
             AvatarURL = avatarURL;
         }
 
+#pragma warning disable CA1002 // Do not expose generic lists
         public DiscordWebhook(List<DiscordEmbed> embeds, string? username = null, Uri? avatarURL = null)
+#pragma warning restore CA1002 // Do not expose generic lists
         {
             Embeds = embeds;
             Username = username;
