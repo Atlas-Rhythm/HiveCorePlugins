@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hive.RateLimiting", "src\Hive.RateLimiting\Hive.RateLimiting.csproj", "{60771E28-3C89-488E-BB13-B06435E77B67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hive.RateLimiting", "src\Hive.RateLimiting\Hive.RateLimiting.csproj", "{60771E28-3C89-488E-BB13-B06435E77B67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hive.FileSystemRuleProvider", "src\Hive.FileSystemRuleProvider\Hive.FileSystemRuleProvider.csproj", "{95D3B68F-8E58-4A7D-B21B-90D91A396CE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hive.FileSystemRuleProvider", "src\Hive.FileSystemRuleProvider\Hive.FileSystemRuleProvider.csproj", "{95D3B68F-8E58-4A7D-B21B-90D91A396CE2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hive.FileSystemCdnProvider", "src\Hive.FileSystemCdnProvider\Hive.FileSystemCdnProvider.csproj", "{7217CA0D-3648-4373-A282-787E5285E5D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{95D3B68F-8E58-4A7D-B21B-90D91A396CE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95D3B68F-8E58-4A7D-B21B-90D91A396CE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95D3B68F-8E58-4A7D-B21B-90D91A396CE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7217CA0D-3648-4373-A282-787E5285E5D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7217CA0D-3648-4373-A282-787E5285E5D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7217CA0D-3648-4373-A282-787E5285E5D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7217CA0D-3648-4373-A282-787E5285E5D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
