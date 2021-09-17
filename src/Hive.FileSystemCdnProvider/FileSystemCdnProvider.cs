@@ -162,10 +162,10 @@ namespace Hive.FileSystemCdnProvider
             return Task.FromResult(new Uri(cdnUrl));
         }
 
-        // REVIEW: What do return if CdnObject isn't in CDN
         public Task<string> GetObjectName(CdnObject link)
             => cdnObjectToCdnEntry.TryGetValue(link.UniqueId, out var cdnEntry)
                 ? Task.FromResult(cdnEntry.ObjectName)
+                // REVIEW: What do return if CdnObject isn't in CDN
                 : Task.FromResult(string.Empty);
 
         // Helper method to write our cdn object to the metadata file.
