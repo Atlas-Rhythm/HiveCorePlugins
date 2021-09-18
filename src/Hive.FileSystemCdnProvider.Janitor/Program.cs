@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -37,7 +36,7 @@ namespace Hive.FileSystemCdnProvider.Janitor
             using var fileStream = metadataFileInfo.Open(FileMode.Open, FileAccess.ReadWrite);
 
             // Deserialize metadata and grab our current instant to compare against the entries
-            var metadata = await JsonSerializer.DeserializeAsync<Dictionary<string, FileSystemCdnEntry>>(fileStream).ConfigureAwait(false);
+            var metadata = await JsonSerializer.DeserializeAsync<FileSystemCdnMetadata>(fileStream).ConfigureAwait(false);
             var currentInstant = SystemClock.Instance.GetCurrentInstant();
 
             // We also need this to be a separate collection (to prevent "Collection was modified" exceptions) so we allocate a new array
@@ -47,6 +46,7 @@ namespace Hive.FileSystemCdnProvider.Janitor
                 var uniqueId = kvp.Key;
                 var entry = kvp.Value;
 
+                // REVIEW: Will evaluating "Instant >= Instant?" always return false if the right hand is null?
                 if (currentInstant >= entry.ExpiresAt)
                 {
                     // Attempt to grab the directory that hosts the CdnObject

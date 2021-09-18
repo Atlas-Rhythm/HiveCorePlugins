@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
@@ -12,8 +11,6 @@ using Serilog;
 
 namespace Hive.FileSystemCdnProvider
 {
-    // REVIEW: This is my first time doing anything CDN related and also the first draft of a CDN provider. How stupid is the entire class?
-    // TODO: Janitor project/application to clean up expired CDN objects
     // TODO: Test
     public class FileSystemCdnProvider : ICdnProvider
     {
@@ -28,7 +25,7 @@ namespace Hive.FileSystemCdnProvider
         private readonly string cdnSubfolder;
         private readonly string cdnPath;
         private readonly string metadataPath;
-        private readonly Dictionary<string, FileSystemCdnEntry> cdnObjectToCdnEntry = new();
+        private readonly FileSystemCdnMetadata cdnMetadata = new();
 
         public FileSystemCdnProvider(ILogger logger, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
@@ -45,11 +42,11 @@ namespace Hive.FileSystemCdnProvider
             // REVIEW: Is it dumb to store the metadata in the cdn subdirectory?
             if (File.Exists(metadataPath))
             {
-                var metadataDictionary = JsonSerializer.Deserialize<Dictionary<string, FileSystemCdnEntry>>(File.ReadAllText(metadataPath));
+                var metadataFromDisk = JsonSerializer.Deserialize<FileSystemCdnMetadata>(File.ReadAllText(metadataPath));
 
-                if (metadataDictionary != null)
+                if (metadataFromDisk != null)
                 {
-                    cdnObjectToCdnEntry = metadataDictionary;
+                    cdnMetadata = metadataFromDisk;
                 }
             }
 
@@ -85,7 +82,7 @@ namespace Hive.FileSystemCdnProvider
             var cdnObject = new CdnObject(streamHash);
             var cdnEntry = new FileSystemCdnEntry(cdnObject.UniqueId, expireAt);
 
-            cdnObjectToCdnEntry.Add(cdnObject.UniqueId, cdnEntry);
+            cdnMetadata.Add(cdnObject.UniqueId, cdnEntry);
 
             await WriteCdnMapToMetadataFile().ConfigureAwait(false);
 
@@ -94,7 +91,7 @@ namespace Hive.FileSystemCdnProvider
 
         public async Task<bool> RemoveExpiry(CdnObject link)
         {
-            if (cdnObjectToCdnEntry.TryGetValue(link.UniqueId, out var cdnEntry))
+            if (cdnMetadata.TryGetValue(link.UniqueId, out var cdnEntry))
             {
                 cdnEntry.ExpiresAt = null;
 
@@ -108,7 +105,7 @@ namespace Hive.FileSystemCdnProvider
 
         public async Task SetExpiry(CdnObject link, Instant expireAt)
         {
-            if (cdnObjectToCdnEntry.TryGetValue(link.UniqueId, out var cdnEntry))
+            if (cdnMetadata.TryGetValue(link.UniqueId, out var cdnEntry))
             {
                 cdnEntry.ExpiresAt = expireAt;
 
@@ -127,7 +124,7 @@ namespace Hive.FileSystemCdnProvider
 
             Directory.Delete(cdnDir, true);
 
-            _ = cdnObjectToCdnEntry.Remove(link.UniqueId);
+            _ = cdnMetadata.Remove(link.UniqueId);
 
             logger.Information("CDN object {0} has been deleted.", link.UniqueId);
 
@@ -154,7 +151,7 @@ namespace Hive.FileSystemCdnProvider
 
             // Get CDN unique ID and object name
             var cdnUniqueId = link.UniqueId;
-            var cdnEntry = cdnObjectToCdnEntry[cdnUniqueId];
+            var cdnEntry = cdnMetadata[cdnUniqueId];
 
             // Slap everything together and return the result
             var cdnUrl = $"{baseUrl}/{cdnSubfolder}/{cdnUniqueId}/{cdnEntry.ObjectName}";
@@ -163,7 +160,7 @@ namespace Hive.FileSystemCdnProvider
         }
 
         public Task<string> GetObjectName(CdnObject link)
-            => cdnObjectToCdnEntry.TryGetValue(link.UniqueId, out var cdnEntry)
+            => cdnMetadata.TryGetValue(link.UniqueId, out var cdnEntry)
                 ? Task.FromResult(cdnEntry.ObjectName)
                 // REVIEW: What do return if CdnObject isn't in CDN
                 : Task.FromResult(string.Empty);
@@ -173,7 +170,7 @@ namespace Hive.FileSystemCdnProvider
         {
             using var metadataStream = File.OpenWrite(metadataPath);
 
-            await JsonSerializer.SerializeAsync(metadataStream, cdnObjectToCdnEntry).ConfigureAwait(false);
+            await JsonSerializer.SerializeAsync(metadataStream, cdnMetadata).ConfigureAwait(false);
         }
     }
 }
