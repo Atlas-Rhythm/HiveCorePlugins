@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using NodaTime;
@@ -8,8 +8,8 @@ using NodaTime;
 namespace Hive.FileSystemCdnProvider.Janitor
 {
     /*
-     * The Janitor application is a simple console application which enumerates over the entries
-     * in the Hive FileSystemCdnProvider metadata file, and removes any entries that are past their expire date.
+     * The Janitor application is a simple console application which enumerates over all metadata files
+     * in the Hive CDN folder, and removes any entries that are past their expire date.
      * 
      * This was designed to be a separate application which runs on a crontable, separate from main Hive.
      */
@@ -24,48 +24,60 @@ namespace Hive.FileSystemCdnProvider.Janitor
             }
 
             // Attempt to load the metadata file and throw if it does not exist
-            var metadataFileInfo = new FileInfo(args[0]);
+            var cdnPath = new DirectoryInfo(args[0]);
 
-            if (!metadataFileInfo.Exists)
+            if (!cdnPath.Exists)
             {
-                throw new InvalidOperationException("The metadata file given to the Janitor does not exist.");
+                throw new DirectoryNotFoundException("The CDN directory given to the Janitor does not exist.");
             }
 
-            // Open a read/write stream to the metadata file
-            // REVIEW: Given Hive can possibly be reading/writing to this file at the same time, should I have the Janitor wait until the file is unlocked?
-            using var fileStream = metadataFileInfo.Open(FileMode.Open, FileAccess.ReadWrite);
-
-            // Deserialize metadata and grab our current instant to compare against the entries
-            var metadata = await JsonSerializer.DeserializeAsync<FileSystemCdnMetadata>(fileStream).ConfigureAwait(false);
             var currentInstant = SystemClock.Instance.GetCurrentInstant();
 
-            // We also need this to be a separate collection (to prevent "Collection was modified" exceptions) so we allocate a new array
-            foreach (var kvp in metadata.ToArray())
+            var metadataFilesToRemove = new List<string>();
+
+            foreach (var metadataFile in cdnPath.EnumerateFiles($"*{FileSystemMetadataWrapper.MetadataExtension}"))
             {
-                // Key is CdnObject UniqueId, value is FileSystemCdnEntry (data struct which holds object name and expiry date)
-                var uniqueId = kvp.Key;
-                var entry = kvp.Value;
-
-                // REVIEW: Will evaluating "Instant >= Instant?" always return false if the right hand is null?
-                if (currentInstant >= entry.ExpiresAt)
+                try
                 {
-                    // Attempt to grab the directory that hosts the CdnObject
-                    // Since the CDN entry is expired, we need to clean up its presence in the file system.
-                    var cdnDirectory = Path.Combine(metadataFileInfo.Directory.FullName, uniqueId);
-                    var cdnDirectoryInfo = new DirectoryInfo(cdnDirectory);
+                    using var stream = metadataFile.Open(FileMode.Open, FileAccess.ReadWrite);
 
-                    if (cdnDirectoryInfo.Exists)
+                    var cdnEntry = await JsonSerializer.DeserializeAsync<FileSystemCdnEntry>(stream).ConfigureAwait(false);
+
+                    if (cdnEntry.MarkedForCleanup)
                     {
-                        cdnDirectoryInfo.Delete(true);
-                    }
+                        // We add metadata files to a list to delete after we iterate here (removes stream/io jank)
+                        metadataFilesToRemove.Add(metadataFile.FullName);
 
-                    // At this point the directory should not exist any more, so we remove the uniqueID from the collection
-                    _ = metadata.Remove(uniqueId);
+                        // Unique ID is the metadata file without the extension.
+                        var uniqueId = metadataFile.Name.Replace(FileSystemMetadataWrapper.MetadataExtension, "");
+
+                        // Delete the folder with the object data
+                        var objectDirectory = new DirectoryInfo(Path.Combine(cdnPath.FullName, metadataFile.Name));
+                        if (objectDirectory.Exists)
+                        {
+                            objectDirectory.Delete(true);
+                        }
+                    }
+                    // Files can stay in CDN a little bit longer so we mark them for removal on the next sweep
+                    else if (cdnEntry.ExpiresAt >= currentInstant)
+                    {
+                        cdnEntry.MarkedForCleanup = true;
+
+                        await JsonSerializer.SerializeAsync(stream, cdnEntry);
+                    }
+                }
+                catch
+                {
+                    // Files can stay in CDN a little bit longer, we'll get 'em next time
+                    continue;
                 }
             }
 
-            // ...And write our cleaned up results back into the metadata file.
-            await JsonSerializer.SerializeAsync(fileStream, metadata);
+            // Once all metadata files are read from and accounted for, remove the ones marked for cleanup
+            foreach (var metadataFile in metadataFilesToRemove)
+            {
+                File.Delete(metadataFile);
+            }
         }
     }
 }

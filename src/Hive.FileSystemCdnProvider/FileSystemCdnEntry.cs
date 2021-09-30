@@ -15,10 +15,15 @@ namespace Hive.FileSystemCdnProvider
 
         /// <summary>
         /// If not null, this is the <see cref="Instant"/> that the CDN Entry is considered expired,
-        /// and will be removed by the Janitor application on its next sweep.
+        /// and will be marked for removal via <see cref="MarkedForCleanup"/>
         /// </summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Instant? ExpiresAt { get; set; }
+
+        /// <summary>
+        /// If <see cref="true"/>, the Janitor will clear up the CDN Entry on its next sweep.
+        /// </summary>
+        public bool MarkedForCleanup { get; set; }
 
         public FileSystemCdnEntry(string name, Instant? expiresAt = null)
         {
