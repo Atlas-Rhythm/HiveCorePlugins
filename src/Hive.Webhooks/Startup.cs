@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Hive.Webhooks
 {
@@ -24,12 +25,9 @@ namespace Hive.Webhooks
                 .AddSingleton<IChannelsControllerPlugin, HookEmitter>()
                 .AddSingleton<IHookConverter, DiscordHookConverter>();
 
+            _ = services.AddHttpClient();
             _ = services.Configure<WebhookSettings>(Configuration.GetSection(nameof(Webhooks)));
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            // TODO: Configure the application
+            _ = services.AddSingleton(sp => sp.GetRequiredService<IOptions<WebhookSettings>>().Value);
         }
     }
 }

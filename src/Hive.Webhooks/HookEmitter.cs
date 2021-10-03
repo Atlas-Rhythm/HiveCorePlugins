@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Hive.Models;
 using Hive.Services.Common;
@@ -18,6 +19,12 @@ namespace Hive.Webhooks
         private readonly HttpClient _httpClient;
         private readonly WebhookSettings _webhookSettings;
         private readonly IEnumerable<IHookConverter> _hookConverters;
+
+        private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
 
         public HookEmitter([DisallowNull] ILogger logger, HttpClient httpClient, WebhookSettings webhookSettings, IEnumerable<IHookConverter> hookConverters)
         {
@@ -70,11 +77,12 @@ namespace Hive.Webhooks
             {
                 foreach (var url in urls!)
                 {
+                    var bodyContent = JsonSerializer.Serialize(hook, _jsonSerializerOptions);
                     var body = new HttpRequestMessage
                     {
                         Method = HttpMethod.Post,
                         RequestUri = new Uri(url),
-                        Content = new StringContent(JsonSerializer.Serialize(hook), Encoding.UTF8, "application/json"),
+                        Content = new StringContent(bodyContent, Encoding.UTF8, "application/json"),
                     };
                     var response = await _httpClient.SendAsync(body).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Hive.Webhooks.Settings
 {
     public class WebhookSettings
     {
-        public ReadOnlyCollection<string> Discord { get; set; } = null!;
+#pragma warning disable CA1002 // Do not expose generic lists
+        public List<string> Discord { get; init; } = null!;
+#pragma warning restore CA1002 
 
         public bool TryGetHookURLs(string id, out IEnumerable<string>? urls)
         {
