@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31410.357
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hive.Webhooks", "src\Hive.Webhooks\Hive.Webhooks.csproj", "{BC717A55-C929-4053-9B88-FFD0DD7E9194}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hive.Webhooks", "src\Hive.Webhooks\Hive.Webhooks.csproj", "{F4083570-3600-47F3-B104-FDEB680BCA41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BC717A55-C929-4053-9B88-FFD0DD7E9194}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC717A55-C929-4053-9B88-FFD0DD7E9194}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BC717A55-C929-4053-9B88-FFD0DD7E9194}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC717A55-C929-4053-9B88-FFD0DD7E9194}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4083570-3600-47F3-B104-FDEB680BCA41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4083570-3600-47F3-B104-FDEB680BCA41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4083570-3600-47F3-B104-FDEB680BCA41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4083570-3600-47F3-B104-FDEB680BCA41}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
