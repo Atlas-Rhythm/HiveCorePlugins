@@ -10,5 +10,6 @@ namespace Hive.Webhooks
 
         public Startup(IConfiguration config)
             => Configuration = config;
+
     }
 }
