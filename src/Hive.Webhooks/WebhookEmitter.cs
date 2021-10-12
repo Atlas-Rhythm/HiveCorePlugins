@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Hive.Models;
 using Hive.Services.Common;
@@ -13,15 +15,17 @@ namespace Hive.Webhooks
     {
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
+        private readonly WebhookSettings _webhookSettings;
         private readonly IEnumerable<IHiveWebhook> _hiveWebhooks;
 
-        public WebhookEmitter([DisallowNull] ILogger logger, HttpClient httpClient, IEnumerable<IHiveWebhook> hiveWebhooks)
+        public WebhookEmitter([DisallowNull] ILogger logger, HttpClient httpClient, WebhookSettings webhookSettings, IEnumerable<IHiveWebhook> hiveWebhooks)
         {
             if (logger is null)
                 throw new ArgumentNullException(nameof(logger));
 
             _httpClient = httpClient;
             _hiveWebhooks = hiveWebhooks;
+            _webhookSettings = webhookSettings;
             _logger = logger.ForContext<WebhookEmitter>();
         }
 
@@ -59,6 +63,27 @@ namespace Hive.Webhooks
             _ = Task.Run(() => Emit(hiveWebhook, body));
         }
 
-        private Task Emit(IHiveWebhook hookConverter, object? hook) => throw new NotImplementedException();
+        private async Task Emit(IHiveWebhook hookConverter, object? hook)
+        {
+            if (_webhookSettings.EmitTo.TryGetValue(hookConverter.ID, out var urls))
+            {
+                foreach (var url in urls)
+                {
+                    var body = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Post,
+                        RequestUri = new Uri(url),
+                        Content = new StringContent(JsonSerializer.Serialize(hook), Encoding.UTF8, "application/json"),
+                    };
+                    var response = await _httpClient.SendAsync(body).ConfigureAwait(false);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.Warning("Unable to successfully execute the webhook to {URL}: {ErrorCode}", url, response.StatusCode);
+                        return;
+                    }
+                    _logger.Information("Successfully executed a webhook to: {URL}", url);
+                }
+            }
+        }
     }
 }

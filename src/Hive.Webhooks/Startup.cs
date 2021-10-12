@@ -1,4 +1,5 @@
-﻿using Hive.Plugins;
+﻿using DryIoc;
+using Hive.Plugins;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -16,9 +17,14 @@ namespace Hive.Webhooks
         public void ConfigureServices(IServiceCollection services)
         {
             _ = services.AddHttpClient();
-            _ = services.AddScoped<WebhookEmitter>();
             _ = services.Configure<WebhookSettings>(Configuration);
             _ = services.AddSingleton(sp => sp.GetRequiredService<IOptions<WebhookSettings>>().Value);
+        }
+
+        public void ConfigureContainer(Container container)
+        {
+            container.RegisterMany<WebhookEmitter>(Reuse.Singleton);
+            container.Register<IHiveWebhook, DefaultHiveWebhook>(Reuse.Singleton);
         }
     }
 }
