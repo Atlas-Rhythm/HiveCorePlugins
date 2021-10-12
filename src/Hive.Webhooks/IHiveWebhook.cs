@@ -7,12 +7,14 @@ namespace Hive.Webhooks
     /// </summary>
     public interface IHiveWebhook
     {
-        object? ModMoved(Mod mod) => null;
+        public string ID { get; }
 
-        object? ModCreated(Mod mod) => null;
+        public object? ModMoved(Mod mod) => null;
 
-        object? ChannelCreated(Channel channel) => null;
+        public object? ModCreated(Mod mod) => null;
 
-        object? GameVersionCreated(GameVersion gameVersion) => null;
+        public object? ChannelCreated(Channel channel) => null;
+
+        public object? GameVersionCreated(GameVersion gameVersion) => null;
     }
 }
