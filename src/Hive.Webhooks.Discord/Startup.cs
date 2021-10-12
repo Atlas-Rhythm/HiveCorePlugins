@@ -17,6 +17,7 @@ namespace Hive.Webhooks
         public void ConfigureServices(IServiceCollection services)
         {
             _ = services.Configure<DiscordHookSettings>(Configuration);
+            _ = services.AddSingleton<IHiveWebhook, DiscordHiveWebhook>();
             _ = services.AddSingleton(sp => sp.GetRequiredService<IOptions<DiscordHookSettings>>().Value);
         }
     }
