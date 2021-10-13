@@ -19,9 +19,10 @@ namespace Hive.Webhooks
             _ = services.AddHttpClient();
             _ = services.Configure<WebhookSettings>(Configuration);
             _ = services.AddSingleton(sp => sp.GetRequiredService<IOptions<WebhookSettings>>().Value);
+            _ = services.AddSingleton(sp => sp.GetRequiredService<IOptions<WebhookSettings>>().Value.Discord);
         }
 
-        public void ConfigureContainer(Container container)
+        public static void ConfigureContainer(Container container)
         {
             container.RegisterMany<WebhookEmitter>(Reuse.Singleton);
             container.Register<IHiveWebhook, DefaultHiveWebhook>(Reuse.Singleton);

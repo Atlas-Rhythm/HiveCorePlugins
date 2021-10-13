@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hive.Webhooks", "src\Hive.Webhooks\Hive.Webhooks.csproj", "{F4083570-3600-47F3-B104-FDEB680BCA41}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hive.Webhooks.Discord", "src\Hive.Webhooks.Discord\Hive.Webhooks.Discord.csproj", "{D8CC27AE-2D5E-421D-88F8-FB3C0626119F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{F4083570-3600-47F3-B104-FDEB680BCA41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4083570-3600-47F3-B104-FDEB680BCA41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4083570-3600-47F3-B104-FDEB680BCA41}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D8CC27AE-2D5E-421D-88F8-FB3C0626119F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D8CC27AE-2D5E-421D-88F8-FB3C0626119F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D8CC27AE-2D5E-421D-88F8-FB3C0626119F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D8CC27AE-2D5E-421D-88F8-FB3C0626119F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

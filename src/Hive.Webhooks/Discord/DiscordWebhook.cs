@@ -29,8 +29,7 @@ namespace Hive.Webhooks.Discord
 
         public DiscordWebhook(DiscordEmbed embed, string? username = null, Uri? avatarURL = null)
         {
-            Embeds = new List<DiscordEmbed>();
-
+            Embeds = new();
             Embeds.Add(embed);
             Username = username;
             AvatarURL = avatarURL;
