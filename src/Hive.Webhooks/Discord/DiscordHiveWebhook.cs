@@ -1,4 +1,5 @@
-﻿using Hive.Models;
+﻿using System;
+using Hive.Models;
 using Serilog;
 
 namespace Hive.Webhooks.Discord
@@ -13,8 +14,26 @@ namespace Hive.Webhooks.Discord
 
         public object? ChannelCreated(Channel channel)
         {
-            _logger.Information("DISCORD HIVE WEBHOOK CHANNEL CREATED {ChannelName}", channel.Name);
-            return channel;
+            if (channel is null)
+                throw new ArgumentNullException(nameof(channel));
+
+            DiscordEmbed embed = new() { Title = "Channel Created" };
+            embed.Fields.Add(new("Name", channel.Name));
+
+            DiscordWebhook webhook = new(embed);
+            return webhook;
+        }
+
+        public object? GameVersionCreated(GameVersion gameVersion)
+        {
+            if (gameVersion is null)
+                throw new ArgumentNullException(nameof(gameVersion));
+
+            DiscordEmbed embed = new() { Title = "Game Version Created" };
+            embed.Fields.Add(new("Version", gameVersion.Name));
+
+            DiscordWebhook webhook = new(embed);
+            return webhook;
         }
     }
 }
