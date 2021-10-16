@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Hive.Converters;
 using NodaTime;
 
 namespace Hive.FileSystemCdnProvider
@@ -18,6 +19,7 @@ namespace Hive.FileSystemCdnProvider
         /// and will be marked for removal via <see cref="MarkedForCleanup"/>
         /// </summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonConverter(typeof(NodaInstantWrapper))]
         public Instant? ExpiresAt { get; set; }
 
         /// <summary>
@@ -25,10 +27,11 @@ namespace Hive.FileSystemCdnProvider
         /// </summary>
         public bool MarkedForCleanup { get; set; }
 
-        public FileSystemCdnEntry(string name, Instant? expiresAt = null)
+        public FileSystemCdnEntry(string objectName, Instant? expiresAt = null, bool markedForCleanup = false)
         {
-            ObjectName = name;
+            ObjectName = objectName;
             ExpiresAt = expiresAt;
+            MarkedForCleanup = markedForCleanup;
         }
     }
 }

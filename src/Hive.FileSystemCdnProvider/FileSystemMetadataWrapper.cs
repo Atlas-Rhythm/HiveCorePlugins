@@ -14,29 +14,34 @@ namespace Hive.FileSystemCdnProvider
 
         public FileSystemCdnEntry? CdnEntry { get; set; }
 
-        public string MetadataPath { get; init; }
-
         private readonly FileStream fileStream;
 
         public FileSystemMetadataWrapper(string cdnPath, string uniqueId)
-            : this(Path.Combine(cdnPath, $"{uniqueId}{MetadataExtension}"))
         {
+            var metadataPath = Path.Combine(cdnPath, $"{uniqueId}{MetadataExtension}");
+
+            fileStream = File.Open(metadataPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+
+            if (fileStream.Length > 0)
+            {
+                // REVIEW: Is this dumb?
+                var bytes = new byte[fileStream.Length];
+                _ = fileStream.Read(bytes, 0, bytes.Length);
+
+                CdnEntry = JsonSerializer.Deserialize<FileSystemCdnEntry>(bytes);
+            }
+
+            _ = fileStream.Seek(0, SeekOrigin.Begin);
         }
 
-        public FileSystemMetadataWrapper(string completeMetadataPath)
+        public async Task WriteToDisk()
         {
-            MetadataPath = completeMetadataPath;
+            fileStream.SetLength(0);
 
-            fileStream = File.Open(completeMetadataPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            await JsonSerializer.SerializeAsync(fileStream, CdnEntry).ConfigureAwait(false);
 
-            // REVIEW: Is this dumb?
-            var bytes = new byte[fileStream.Length];
-            _ = fileStream.Read(bytes, 0, bytes.Length);
-
-            CdnEntry = JsonSerializer.Deserialize<FileSystemCdnEntry>(bytes);
+            _ = fileStream.Seek(0, SeekOrigin.Begin);
         }
-
-        public async Task WriteToDisk() => await JsonSerializer.SerializeAsync(fileStream, CdnEntry).ConfigureAwait(false);
 
         public void Dispose() => fileStream.Dispose();
 

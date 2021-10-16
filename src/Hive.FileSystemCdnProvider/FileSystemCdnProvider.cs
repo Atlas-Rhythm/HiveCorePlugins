@@ -29,6 +29,8 @@ namespace Hive.FileSystemCdnProvider
             cdnSubfolder = configuration.GetValue(SubfolderConfigurationKey, SubfolderDefaultValue);
 
             cdnPath = Path.Combine(Directory.GetCurrentDirectory(), cdnSubfolder);
+
+            _ = Directory.CreateDirectory(cdnPath);
         }
 
         public async Task<CdnObject> UploadObject(string name, Stream data, Instant? expireAt)
@@ -49,12 +51,12 @@ namespace Hive.FileSystemCdnProvider
             // The UploadController already seeks to the beginning, but this is just in case another caller forgets to
             _ = data.Seek(0, SeekOrigin.Begin);
 
-            // CDN path shall be <Hive>/<Subfolder>/<Stream Hash>/<File Name>
-            var objectCdnPath = Path.Combine(cdnPath, uniqueId, name);
-
-            _ = Directory.CreateDirectory(objectCdnPath);
+            // CDN directory shall be <Hive>/<Subfolder>/<Stream Hash>
+            var objectCdnDirectory = Path.Combine(cdnPath, uniqueId);
+            _ = Directory.CreateDirectory(objectCdnDirectory);
 
             // Lets construct a file stream and copy our data to that file.
+            var objectCdnPath = Path.Combine(objectCdnDirectory, name);
             using var fileStream = File.Create(objectCdnPath);
 
             await data.CopyToAsync(fileStream).ConfigureAwait(false);
