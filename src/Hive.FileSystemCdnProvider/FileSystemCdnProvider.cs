@@ -16,10 +16,13 @@ namespace Hive.FileSystemCdnProvider
         private const string SubfolderConfigurationKey = "CdnSubfolder";
         private const string SubfolderDefaultValue = "cdn";
 
+        private const string PublicUrlConfigurationKey = "PublicUrlBase";
+
         private readonly ILogger logger;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly string cdnSubfolder;
         private readonly string cdnPath;
+        private readonly string? publicUrlBase;
 
         public FileSystemCdnProvider(ILogger logger, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
@@ -27,6 +30,8 @@ namespace Hive.FileSystemCdnProvider
             this.httpContextAccessor = httpContextAccessor;
 
             cdnSubfolder = configuration.GetValue(SubfolderConfigurationKey, SubfolderDefaultValue);
+
+            publicUrlBase = configuration.GetValue(PublicUrlConfigurationKey, (string?)null);
 
             cdnPath = Path.Combine(Directory.GetCurrentDirectory(), cdnSubfolder);
 
@@ -152,12 +157,18 @@ namespace Hive.FileSystemCdnProvider
                 throw new InvalidOperationException(nameof(httpContextAccessor.HttpContext));
             }
 
-            // Get components to construct the base url
-            var request = httpContextAccessor.HttpContext.Request;
-            var host = request.Host.ToUriComponent();
-            var pathBase = request.PathBase.ToUriComponent();
-            // REVIEW: Should I enforce HTTPS here or stick with the request scheme
-            var baseUrl = $"{request.Scheme}://{host}{pathBase}";
+            var baseUrl = publicUrlBase;
+
+            if (baseUrl is null)
+            {
+                // Get components to construct the base url
+                var request = httpContextAccessor.HttpContext.Request;
+                var host = request.Host.ToUriComponent();
+                var pathBase = request.PathBase.ToUriComponent();
+
+                // REVIEW: Should I enforce HTTPS here or stick with the request scheme
+                baseUrl = $"{request.Scheme}://{host}{pathBase}";
+            }
 
             // Get CDN unique ID and object name
             var cdnUniqueId = link.UniqueId;
