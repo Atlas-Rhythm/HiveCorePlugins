@@ -10,7 +10,6 @@ using Serilog;
 
 namespace Hive.FileSystemCdnProvider
 {
-    // TODO: Test
     public class FileSystemCdnProvider : ICdnProvider
     {
         private const string SubfolderConfigurationKey = "CdnSubfolder";
@@ -134,6 +133,7 @@ namespace Hive.FileSystemCdnProvider
             {
                 logger.Error("CDN object {0} failed to be deleted: {1}", link.UniqueId, e);
 
+                // REVIEW: Should I mark this failed object for Janitor deletion?
                 return Task.FromResult(false);
             }
         }
@@ -171,6 +171,7 @@ namespace Hive.FileSystemCdnProvider
             var cdnUniqueId = link.UniqueId;
 
             // Slap everything together and return the result
+            // REVIEW: Should I include cdnSubfolder if we are using a public URL base (for reverse proxies, etc.)?
             var cdnUrl = $"{baseUrl}/{cdnSubfolder}/{cdnUniqueId}/{metadata.CdnEntry.ObjectName}";
 
             return new Uri(cdnUrl);
