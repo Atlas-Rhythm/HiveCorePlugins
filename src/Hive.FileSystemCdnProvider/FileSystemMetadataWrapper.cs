@@ -22,11 +22,18 @@ namespace Hive.FileSystemCdnProvider
         {
             var metadataPath = Path.Combine(cdnPath, uniqueId + MetadataExtension);
 
+            var fileExisted = File.Exists(metadataPath);
+
             var fileStream = File.Open(metadataPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 
-            var cdnEntry = await JsonSerializer.DeserializeAsync<FileSystemCdnEntry>(fileStream).ConfigureAwait(false);
+            if (fileExisted)
+            {
+                var cdnEntry = await JsonSerializer.DeserializeAsync<FileSystemCdnEntry>(fileStream).ConfigureAwait(false);
 
-            return new FileSystemMetadataWrapper(fileStream, cdnEntry);
+                return new FileSystemMetadataWrapper(fileStream, cdnEntry);
+            }
+
+            return new FileSystemMetadataWrapper(fileStream, null);
         }
 
         public FileSystemCdnEntry? CdnEntry { get; set; }
@@ -44,10 +51,13 @@ namespace Hive.FileSystemCdnProvider
         // so the behavior is clearly visible in calling methods
         public async Task WriteToDisk()
         {
-            // Need to clear out the file entirely
-            fileStream.SetLength(0);
+            if (CdnEntry != null)
+            {
+                // Need to clear out the file entirely
+                fileStream.SetLength(0);
 
-            await JsonSerializer.SerializeAsync(fileStream, CdnEntry).ConfigureAwait(false);
+                await JsonSerializer.SerializeAsync(fileStream, CdnEntry).ConfigureAwait(false);
+            }
         }
 
         public void Dispose() => fileStream.Dispose();

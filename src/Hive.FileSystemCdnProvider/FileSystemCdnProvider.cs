@@ -31,7 +31,7 @@ namespace Hive.FileSystemCdnProvider
 
             cdnSubfolder = configuration.GetValue(SubfolderConfigurationKey, SubfolderDefaultValue);
 
-            publicUrlBase = configuration.GetValue(PublicUrlConfigurationKey, (string?)null);
+            publicUrlBase = configuration.GetValue<string?>(PublicUrlConfigurationKey, null);
 
             cdnPath = Path.Combine(Directory.GetCurrentDirectory(), cdnSubfolder);
 
@@ -52,9 +52,6 @@ namespace Hive.FileSystemCdnProvider
 
             // Create our metadata file here, with our new unique ID
             using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, uniqueId).ConfigureAwait(false);
-
-            // The UploadController already seeks to the beginning, but this is just in case another caller forgets to
-            _ = data.Seek(0, SeekOrigin.Begin);
 
             // CDN directory shall be <Hive>/<Subfolder>/<Stream Hash>
             var objectCdnDirectory = Path.Combine(cdnPath, uniqueId);
