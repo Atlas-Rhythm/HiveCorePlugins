@@ -46,7 +46,7 @@ namespace Hive.FileSystemCdnProvider
             var uniqueId = Guid.NewGuid().ToString();
 
             // Create our metadata file here, with our new unique ID
-            using var metadata = new FileSystemMetadataWrapper(cdnPath, uniqueId);
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, uniqueId).ConfigureAwait(false);
 
             // The UploadController already seeks to the beginning, but this is just in case another caller forgets to
             _ = data.Seek(0, SeekOrigin.Begin);
@@ -74,7 +74,7 @@ namespace Hive.FileSystemCdnProvider
         public async Task<bool> RemoveExpiry(CdnObject link)
         {
             // Load metadata file from disk.
-            using var metadata = new FileSystemMetadataWrapper(cdnPath, link.UniqueId);
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, link.UniqueId).ConfigureAwait(false);
 
             // Return false if not found
             if (metadata.CdnEntry is null)
@@ -93,7 +93,7 @@ namespace Hive.FileSystemCdnProvider
         public async Task SetExpiry(CdnObject link, Instant expireAt)
         {
             // Load metadata file from disk.
-            using var metadata = new FileSystemMetadataWrapper(cdnPath, link.UniqueId);
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, link.UniqueId).ConfigureAwait(false);
 
             // Throw if not found
             if (metadata.CdnEntry is null)
@@ -136,10 +136,10 @@ namespace Hive.FileSystemCdnProvider
             }
         }
 
-        public Task<Uri> GetObjectActualUrl(CdnObject link)
+        public async Task<Uri> GetObjectActualUrl(CdnObject link)
         {
             // Load metadata file from disk.
-            using var metadata = new FileSystemMetadataWrapper(cdnPath, link.UniqueId);
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, link.UniqueId).ConfigureAwait(false);
 
             // Throw if not found
             if (metadata.CdnEntry is null)
@@ -165,21 +165,16 @@ namespace Hive.FileSystemCdnProvider
             // Slap everything together and return the result
             var cdnUrl = $"{baseUrl}/{cdnSubfolder}/{cdnUniqueId}/{metadata.CdnEntry.ObjectName}";
 
-            return Task.FromResult(new Uri(cdnUrl));
+            return new Uri(cdnUrl);
         }
 
         public async Task<string> GetObjectName(CdnObject link)
         {
             // Load metadata from disk
-            using var metadata = new FileSystemMetadataWrapper(cdnPath, link.UniqueId);
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, link.UniqueId).ConfigureAwait(false);
 
-            // Obtain object name (or throw if not found)
-            var objectName = metadata.CdnEntry?.ObjectName ?? throw new CdnEntryNotFoundException(nameof(link.UniqueId));
-
-            // Write metadata to disk
-            await metadata.WriteToDisk().ConfigureAwait(false);
-
-            return objectName;
+            // Return object name (or throw if not found)
+            return metadata.CdnEntry?.ObjectName ?? throw new CdnEntryNotFoundException(nameof(link.UniqueId));
         }
     }
 }
