@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Hive.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using NodaTime;
 using Serilog;
 
@@ -12,14 +11,6 @@ namespace Hive.FileSystemCdnProvider
 {
     public class FileSystemCdnProvider : ICdnProvider
     {
-        private const string SubfolderConfigurationKey = "CdnObjectsSubfolder";
-        private const string SubfolderDefaultValue = "cdn/objects";
-
-        private const string MetadataConfigurationKey = "CdnMetadataSubfolder";
-        private const string MetadataDefaultValue = "cdn/metadata";
-
-        private const string PublicUrlConfigurationKey = "PublicUrlBase";
-
         private readonly ILogger logger;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly string? publicUrlBase;
@@ -30,15 +21,20 @@ namespace Hive.FileSystemCdnProvider
         private readonly string cdnMetadataSubfolder;
         private readonly string cdnMetadataPath;
 
-        public FileSystemCdnProvider(ILogger logger, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public FileSystemCdnProvider(ILogger logger, IHttpContextAccessor httpContextAccessor, FileSystemCdnOptions options)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             this.logger = logger;
             this.httpContextAccessor = httpContextAccessor;
 
-            cdnObjectSubfolder = configuration.GetValue(SubfolderConfigurationKey, SubfolderDefaultValue);
-            cdnMetadataSubfolder = configuration.GetValue(MetadataConfigurationKey, MetadataDefaultValue);
+            cdnObjectSubfolder = options.CdnObjectsSubfolder;
+            cdnMetadataSubfolder = options.CdnMetadataSubfolder;
 
-            publicUrlBase = configuration.GetValue<string?>(PublicUrlConfigurationKey, null);
+            publicUrlBase = options.PublicUrlBase?.ToString();
 
             cdnObjectPath = Path.Combine(Directory.GetCurrentDirectory(), cdnObjectSubfolder);
             cdnMetadataPath = Path.Combine(Directory.GetCurrentDirectory(), cdnMetadataSubfolder);

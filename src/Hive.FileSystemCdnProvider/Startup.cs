@@ -15,7 +15,7 @@ namespace Hive.FileSystemCdnProvider
 
         public void ConfigureServices(IServiceCollection services)
         {
-            _ = services.AddSingleton(Configuration);
+            _ = services.Configure<FileSystemCdnOptions>(Configuration);
             _ = services.AddSingleton<ICdnProvider, FileSystemCdnProvider>();
         }
     }
