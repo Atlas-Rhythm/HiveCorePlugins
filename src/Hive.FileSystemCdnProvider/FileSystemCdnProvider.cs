@@ -12,29 +12,38 @@ namespace Hive.FileSystemCdnProvider
 {
     public class FileSystemCdnProvider : ICdnProvider
     {
-        private const string SubfolderConfigurationKey = "CdnSubfolder";
-        private const string SubfolderDefaultValue = "cdn";
+        private const string SubfolderConfigurationKey = "CdnObjectsSubfolder";
+        private const string SubfolderDefaultValue = "cdn/objects";
+
+        private const string MetadataConfigurationKey = "CdnMetadataSubfolder";
+        private const string MetadataDefaultValue = "cdn/metadata";
 
         private const string PublicUrlConfigurationKey = "PublicUrlBase";
 
         private readonly ILogger logger;
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly string cdnSubfolder;
-        private readonly string cdnPath;
         private readonly string? publicUrlBase;
+
+        private readonly string cdnObjectSubfolder;
+        private readonly string cdnObjectPath;
+
+        private readonly string cdnMetadataSubfolder;
+        private readonly string cdnMetadataPath;
 
         public FileSystemCdnProvider(ILogger logger, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
             this.logger = logger;
             this.httpContextAccessor = httpContextAccessor;
 
-            cdnSubfolder = configuration.GetValue(SubfolderConfigurationKey, SubfolderDefaultValue);
+            cdnObjectSubfolder = configuration.GetValue(SubfolderConfigurationKey, SubfolderDefaultValue);
+            cdnMetadataSubfolder = configuration.GetValue(MetadataConfigurationKey, MetadataDefaultValue);
 
             publicUrlBase = configuration.GetValue<string?>(PublicUrlConfigurationKey, null);
 
-            cdnPath = Path.Combine(Directory.GetCurrentDirectory(), cdnSubfolder);
+            cdnObjectPath = Path.Combine(Directory.GetCurrentDirectory(), cdnObjectSubfolder);
+            cdnMetadataPath = Path.Combine(Directory.GetCurrentDirectory(), cdnMetadataSubfolder);
 
-            _ = Directory.CreateDirectory(cdnPath);
+            _ = Directory.CreateDirectory(cdnObjectPath);
         }
 
         public async Task<CdnObject> UploadObject(string name, Stream data, Instant? expireAt)
@@ -50,10 +59,10 @@ namespace Hive.FileSystemCdnProvider
             var uniqueId = Guid.NewGuid().ToString();
 
             // Create our metadata file here, with our new unique ID
-            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, uniqueId).ConfigureAwait(false);
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnMetadataPath, uniqueId).ConfigureAwait(false);
 
-            // CDN directory shall be <Hive>/<Subfolder>/<Stream Hash>
-            var objectCdnDirectory = Path.Combine(cdnPath, uniqueId);
+            // CDN directory shall be <Hive>/<Object Subfolder>/<Stream Hash>
+            var objectCdnDirectory = Path.Combine(cdnObjectPath, uniqueId);
             _ = Directory.CreateDirectory(objectCdnDirectory);
 
             // Lets construct a file stream and copy our data to that file.
@@ -75,7 +84,7 @@ namespace Hive.FileSystemCdnProvider
         public async Task<bool> RemoveExpiry(CdnObject link)
         {
             // Load metadata file from disk.
-            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, link.UniqueId).ConfigureAwait(false);
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnMetadataPath, link.UniqueId).ConfigureAwait(false);
 
             // Return false if not found
             if (metadata.CdnEntry is null)
@@ -94,7 +103,7 @@ namespace Hive.FileSystemCdnProvider
         public async Task SetExpiry(CdnObject link, Instant expireAt)
         {
             // Load metadata file from disk.
-            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, link.UniqueId).ConfigureAwait(false);
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnMetadataPath, link.UniqueId).ConfigureAwait(false);
 
             // Throw if not found
             if (metadata.CdnEntry is null)
@@ -115,10 +124,10 @@ namespace Hive.FileSystemCdnProvider
         public Task<bool> TryDeleteObject(CdnObject link)
         {
             // Construct metadata path ourselves so we're not pinging disk
-            var metadataFile = Path.Combine(cdnPath, $"{link.UniqueId}{FileSystemMetadataWrapper.MetadataExtension}");
+            var metadataFile = Path.Combine(cdnMetadataPath, $"{link.UniqueId}{FileSystemMetadataWrapper.MetadataExtension}");
 
             // Get directory that contains object
-            var cdnDir = Path.Combine(cdnPath, link.UniqueId);
+            var cdnDir = Path.Combine(cdnObjectPath, link.UniqueId);
 
             try
             {
@@ -141,7 +150,7 @@ namespace Hive.FileSystemCdnProvider
         public async Task<Uri> GetObjectActualUrl(CdnObject link)
         {
             // Load metadata file from disk.
-            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, link.UniqueId).ConfigureAwait(false);
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnMetadataPath, link.UniqueId).ConfigureAwait(false);
 
             // Throw if not found
             if (metadata.CdnEntry is null)
@@ -172,7 +181,7 @@ namespace Hive.FileSystemCdnProvider
 
             // Slap everything together and return the result
             // REVIEW: Should I include cdnSubfolder if we are using a public URL base (for reverse proxies, etc.)?
-            var cdnUrl = $"{baseUrl}/{cdnSubfolder}/{cdnUniqueId}/{metadata.CdnEntry.ObjectName}";
+            var cdnUrl = $"{baseUrl}/{cdnObjectSubfolder}/{cdnUniqueId}/{metadata.CdnEntry.ObjectName}";
 
             return new Uri(cdnUrl);
         }
@@ -180,7 +189,7 @@ namespace Hive.FileSystemCdnProvider
         public async Task<string> GetObjectName(CdnObject link)
         {
             // Load metadata from disk
-            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnPath, link.UniqueId).ConfigureAwait(false);
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnMetadataPath, link.UniqueId).ConfigureAwait(false);
 
             // Return object name (or throw if not found)
             return metadata.CdnEntry?.ObjectName ?? throw new CdnEntryNotFoundException(nameof(link.UniqueId));

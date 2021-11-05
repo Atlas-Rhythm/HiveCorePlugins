@@ -15,27 +15,45 @@ namespace Hive.FileSystemCdnProvider.Janitor
      */
     public class Program
     {
+        /*
+         * Janitor arguments:
+         * 0 - Path to core Hive installation
+         * 1 - CDN Metadata subfolder ("CdnMetadataSubfolder" plugin config key)
+         * 2 - CDN Object subfolder ("CdnObjectsSubfolder" plugin config key)
+         */
         public static async Task Main(string[] args)
         {
             // I don't see any need for no arguments or >1 arguments
-            if (args.Length is 0 or > 1)
+            if (args.Length is not 3)
             {
-                throw new ArgumentException("Only one argument can be passed to the Janitor.");
+                throw new ArgumentException("The Janitor requires 3 text arguments: The absolute path to the Hive installation, the relative CDN Metadata subfolder, and the relative CDN Objects subfolder.");
             }
 
             // Attempt to load the metadata file and throw if it does not exist
-            var cdnPath = new DirectoryInfo(args[0]);
+            var hiveInstallation = new DirectoryInfo(args[0]);
+            var cdnMetadataFolder = new DirectoryInfo(Path.Combine(args[0], args[1]));
+            var cdnObjectsFolder = new DirectoryInfo(Path.Combine(args[0], args[2]));
 
-            if (!cdnPath.Exists)
+            if (!hiveInstallation.Exists)
             {
-                throw new DirectoryNotFoundException("The CDN directory given to the Janitor does not exist.");
+                throw new DirectoryNotFoundException($"The Hive installation folder ({hiveInstallation.FullName}) does not exist.");
+            }
+
+            if (!cdnMetadataFolder.Exists)
+            {
+                throw new DirectoryNotFoundException($"The given CDN Metadata folder ({cdnMetadataFolder.FullName}) does not exist.");
+            }
+
+            if (!cdnObjectsFolder.Exists)
+            {
+                throw new DirectoryNotFoundException($"The given CDN Objects folder ({cdnObjectsFolder.FullName}) does not exist.");
             }
 
             var currentInstant = SystemClock.Instance.GetCurrentInstant();
 
             var metadataFilesToRemove = new List<string>();
 
-            foreach (var metadataFile in cdnPath.EnumerateFiles($"*{FileSystemMetadataWrapper.MetadataExtension}"))
+            foreach (var metadataFile in cdnMetadataFolder.EnumerateFiles($"*{FileSystemMetadataWrapper.MetadataExtension}"))
             {
                 try
                 {
@@ -52,7 +70,7 @@ namespace Hive.FileSystemCdnProvider.Janitor
                         var uniqueId = metadataFile.Name.Replace(FileSystemMetadataWrapper.MetadataExtension, "");
 
                         // Delete the folder with the object data
-                        var objectDirectory = new DirectoryInfo(Path.Combine(cdnPath.FullName, metadataFile.Name));
+                        var objectDirectory = new DirectoryInfo(Path.Combine(cdnObjectsFolder.FullName, metadataFile.Name));
                         if (objectDirectory.Exists)
                         {
                             objectDirectory.Delete(true);
