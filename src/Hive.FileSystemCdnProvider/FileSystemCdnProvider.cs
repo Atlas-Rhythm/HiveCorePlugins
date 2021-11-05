@@ -44,6 +44,7 @@ namespace Hive.FileSystemCdnProvider
             cdnMetadataPath = Path.Combine(Directory.GetCurrentDirectory(), cdnMetadataSubfolder);
 
             _ = Directory.CreateDirectory(cdnObjectPath);
+            _ = Directory.CreateDirectory(cdnMetadataPath);
         }
 
         public async Task<CdnObject> UploadObject(string name, Stream data, Instant? expireAt)

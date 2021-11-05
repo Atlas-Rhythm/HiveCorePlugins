@@ -23,13 +23,12 @@ namespace Hive.FileSystemCdnProvider.Janitor
          */
         public static async Task Main(string[] args)
         {
-            // I don't see any need for no arguments or >1 arguments
             if (args.Length is not 3)
             {
-                throw new ArgumentException("The Janitor requires 3 text arguments: The absolute path to the Hive installation, the relative CDN Metadata subfolder, and the relative CDN Objects subfolder.");
+                throw new ArgumentException("The Janitor requires 3 text arguments in this order: The absolute path to the Hive installation, the relative CDN Metadata subfolder, and the relative CDN Objects subfolder.");
             }
 
-            // Attempt to load the metadata file and throw if it does not exist
+            // Grab our directory infos and throw if any dont exist
             var hiveInstallation = new DirectoryInfo(args[0]);
             var cdnMetadataFolder = new DirectoryInfo(Path.Combine(args[0], args[1]));
             var cdnObjectsFolder = new DirectoryInfo(Path.Combine(args[0], args[2]));
@@ -53,6 +52,7 @@ namespace Hive.FileSystemCdnProvider.Janitor
 
             var metadataFilesToRemove = new List<string>();
 
+            // Enumerate all .metadata files in the CDN Metadatas folder
             foreach (var metadataFile in cdnMetadataFolder.EnumerateFiles($"*{FileSystemMetadataWrapper.MetadataExtension}"))
             {
                 try
