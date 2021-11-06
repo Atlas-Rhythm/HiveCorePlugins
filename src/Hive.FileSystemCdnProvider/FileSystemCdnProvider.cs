@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Hive.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Serilog;
 
@@ -21,7 +22,7 @@ namespace Hive.FileSystemCdnProvider
         private readonly string cdnMetadataSubfolder;
         private readonly string cdnMetadataPath;
 
-        public FileSystemCdnProvider(ILogger logger, IHttpContextAccessor httpContextAccessor, FileSystemCdnOptions options)
+        public FileSystemCdnProvider(ILogger logger, IHttpContextAccessor httpContextAccessor, IOptions<FileSystemCdnOptions> options)
         {
             if (options is null)
             {
@@ -31,10 +32,10 @@ namespace Hive.FileSystemCdnProvider
             this.logger = logger;
             this.httpContextAccessor = httpContextAccessor;
 
-            cdnObjectSubfolder = options.CdnObjectsSubfolder;
-            cdnMetadataSubfolder = options.CdnMetadataSubfolder;
+            cdnObjectSubfolder = options.Value.CdnObjectsSubfolder;
+            cdnMetadataSubfolder = options.Value.CdnMetadataSubfolder;
 
-            publicUrlBase = options.PublicUrlBase?.ToString();
+            publicUrlBase = options.Value.PublicUrlBase?.ToString();
 
             cdnObjectPath = Path.Combine(Directory.GetCurrentDirectory(), cdnObjectSubfolder);
             cdnMetadataPath = Path.Combine(Directory.GetCurrentDirectory(), cdnMetadataSubfolder);
@@ -118,7 +119,7 @@ namespace Hive.FileSystemCdnProvider
         [SuppressMessage("Design", "CA1031:Do not catch general exception types",
             Justification = @"Directory.Delete and File.Delete can throw many exceptions, but the behavior for each is the same.
                                 Furthermore, the docs say to return false if the operation fails, rather than throw an exception.")]
-        public Task<bool> TryDeleteObject(CdnObject link)
+        public async Task<bool> TryDeleteObject(CdnObject link)
         {
             // Construct metadata path ourselves so we're not pinging disk
             var metadataFile = Path.Combine(cdnMetadataPath, $"{link.UniqueId}{FileSystemMetadataWrapper.MetadataExtension}");
@@ -133,14 +134,26 @@ namespace Hive.FileSystemCdnProvider
 
                 logger.Information("CDN object {0} has been deleted.", link.UniqueId);
 
-                return Task.FromResult(true);
+                return true;
             }
             catch (Exception e)
             {
                 logger.Error("CDN object {0} failed to be deleted: {1}", link.UniqueId, e);
 
-                // REVIEW: Should I mark this failed object for Janitor deletion?
-                return Task.FromResult(false);
+                using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnMetadataPath, link.UniqueId).ConfigureAwait(false);
+
+                // If the CDN Entry is null, I guess the object was already deleted?
+                // Otherwise, we will mark the file for cleanup and have the Janitor deal with it.
+                if (metadata.CdnEntry != null)
+                {
+                    logger.Warning("Marking CDN object {0} for Janitor cleanup.", link.UniqueId);
+
+                    metadata.CdnEntry.MarkedForCleanup = true;
+
+                    await metadata.WriteToDisk().ConfigureAwait(false);
+                }
+
+                return false;
             }
         }
 
