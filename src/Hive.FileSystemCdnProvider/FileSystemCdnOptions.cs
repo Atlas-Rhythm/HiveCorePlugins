@@ -4,8 +4,8 @@ namespace Hive.FileSystemCdnProvider
 {
     public class FileSystemCdnOptions
     {
-        public string CdnObjectsSubfolder { get; set; } = "cdn/objects";
-        public string CdnMetadataSubfolder { get; set; } = "cdn/metadata";
-        public Uri? PublicUrlBase { get; set; }
+        public string CdnObjectsSubfolder { get; private set; } = "cdn/objects";
+        public string CdnMetadataSubfolder { get; private set; } = "cdn/metadata";
+        public Uri? PublicUrlBase { get; private set; }
     }
 }
