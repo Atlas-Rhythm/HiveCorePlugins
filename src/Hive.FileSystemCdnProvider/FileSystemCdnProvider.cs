@@ -168,8 +168,7 @@ namespace Hive.FileSystemCdnProvider
             var cdnUniqueId = link.UniqueId;
 
             // Slap everything together and return the result
-            // REVIEW: Should I include cdnSubfolder if we are using a public URL base (for reverse proxies, etc.)?
-            var cdnUrl = $"{baseUrl}/{cdnObjectSubfolder}/{cdnUniqueId}/{metadata.CdnEntry.ObjectName}";
+            var cdnUrl = $"{baseUrl}/{cdnUniqueId}/{metadata.CdnEntry.ObjectName}";
 
             return new Uri(cdnUrl);
         }
