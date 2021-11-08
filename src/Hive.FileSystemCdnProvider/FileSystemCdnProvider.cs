@@ -153,6 +153,7 @@ namespace Hive.FileSystemCdnProvider
 
             var baseUrl = publicUrlBase;
 
+            // Fallback to extracting data from http context accessor
             if (baseUrl is null)
             {
                 // Get components to construct the base url
@@ -160,8 +161,18 @@ namespace Hive.FileSystemCdnProvider
                 var host = request.Host.ToUriComponent();
                 var pathBase = request.PathBase.ToUriComponent();
 
-                // REVIEW: Should I enforce HTTPS here or stick with the request scheme
-                baseUrl = $"{request.Scheme}://{host}{pathBase}";
+                var uriBuilder = new UriBuilder
+                {
+                    Host = host,
+                    Scheme = request.Scheme,
+                    Path = pathBase,
+                };
+
+                // Port is nullable so I guess I'll conditionally set port if it's not null
+                // REVIEW: Is this dumb? Should I add a configuration option for port?
+                if (request.Host.Port != null) uriBuilder.Port = request.Host.Port.Value;
+
+                baseUrl = uriBuilder.Uri.ToString();
             }
 
             // Get CDN unique ID and object name
