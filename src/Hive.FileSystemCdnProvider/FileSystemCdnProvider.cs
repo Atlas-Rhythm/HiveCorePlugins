@@ -154,6 +154,7 @@ namespace Hive.FileSystemCdnProvider
             var baseUrl = publicUrlBase;
 
             // Fallback to extracting data from http context accessor
+            // (in case reverse proxy url is null)
             if (baseUrl is null)
             {
                 // Get components to construct the base url
