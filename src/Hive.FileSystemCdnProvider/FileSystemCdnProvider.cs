@@ -115,46 +115,24 @@ namespace Hive.FileSystemCdnProvider
             await metadata.WriteToDisk().ConfigureAwait(false);
         }
 
-        // REVIEW: Is this stupid (both the suppression and not being completely async)
-        [SuppressMessage("Design", "CA1031:Do not catch general exception types",
-            Justification = @"Directory.Delete and File.Delete can throw many exceptions, but the behavior for each is the same.
-                                Furthermore, the docs say to return false if the operation fails, rather than throw an exception.")]
         public async Task<bool> TryDeleteObject(CdnObject link)
         {
-            // Construct metadata path ourselves so we're not pinging disk
-            var metadataFile = Path.Combine(cdnMetadataPath, $"{link.UniqueId}{FileSystemMetadataWrapper.MetadataExtension}");
+            using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnMetadataPath, link.UniqueId).ConfigureAwait(false);
 
-            // Get directory that contains object
-            var cdnDir = Path.Combine(cdnObjectPath, link.UniqueId);
-
-            try
+            // If the CDN Entry is null, I guess the object was already deleted?
+            // Otherwise, we will mark the file for cleanup and have the Janitor deal with it.
+            if (metadata.CdnEntry != null && !metadata.CdnEntry.MarkedForCleanup)
             {
-                Directory.Delete(cdnDir, true);
-                File.Delete(metadataFile);
+                logger.Warning("Marking CDN object {0} for Janitor cleanup.", link.UniqueId);
 
-                logger.Information("CDN object {0} has been deleted.", link.UniqueId);
+                metadata.CdnEntry.MarkedForCleanup = true;
+
+                await metadata.WriteToDisk().ConfigureAwait(false);
 
                 return true;
             }
-            catch (Exception e)
-            {
-                logger.Error("CDN object {0} failed to be deleted: {1}", link.UniqueId, e);
 
-                using var metadata = await FileSystemMetadataWrapper.OpenMetadataAsync(cdnMetadataPath, link.UniqueId).ConfigureAwait(false);
-
-                // If the CDN Entry is null, I guess the object was already deleted?
-                // Otherwise, we will mark the file for cleanup and have the Janitor deal with it.
-                if (metadata.CdnEntry != null)
-                {
-                    logger.Warning("Marking CDN object {0} for Janitor cleanup.", link.UniqueId);
-
-                    metadata.CdnEntry.MarkedForCleanup = true;
-
-                    await metadata.WriteToDisk().ConfigureAwait(false);
-                }
-
-                return false;
-            }
+            return false;
         }
 
         public async Task<Uri> GetObjectActualUrl(CdnObject link)
