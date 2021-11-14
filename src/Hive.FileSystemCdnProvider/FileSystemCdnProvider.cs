@@ -180,7 +180,7 @@ namespace Hive.FileSystemCdnProvider
             var cdnUniqueId = link.UniqueId;
 
             // Slap everything together and return the result
-            var cdnUrl = $"{baseUrl}/{cdnUniqueId}/{metadata.CdnEntry.ObjectName}";
+            var cdnUrl = $"{baseUrl}/{cdnUniqueId}/{Uri.EscapeDataString(metadata.CdnEntry.ObjectName)}";
 
             return new Uri(cdnUrl);
         }
