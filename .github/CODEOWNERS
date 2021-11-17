@@ -1,6 +1,10 @@
 
 *                                   @Atlas-Rhythm/hive-backend
 
+/src/Hive.FileSystemCdnProvider*/   @Caeden117
+/src/Hive.FileSystemRuleProvider/	@Caeden117
+/src/Hive.RateLimiting/				@Caeden117
+
 /.github/                           @sc2ad
 
 .editorconfig                       @nike4613
