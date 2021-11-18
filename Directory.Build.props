@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <Import Project="tools/_Build.props"/>
+  
+  <PropertyGroup>
+    <PackageTags>$(PackageTags);plugin</PackageTags>
+  </PropertyGroup>
+  
+</Project>
