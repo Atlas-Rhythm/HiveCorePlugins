@@ -61,6 +61,15 @@ namespace Hive.FileSystemCdnProvider.Janitor
 
                     var cdnEntry = await JsonSerializer.DeserializeAsync<FileSystemCdnEntry>(stream).ConfigureAwait(false);
 
+                    // Does the CDN Entry not exist?
+                    if (cdnEntry == null)
+                    {
+                        // If it does not, our metadata file points to nonexistent data, we should clean that up.
+                        metadataFilesToRemove.Add(metadataFile.FullName);
+
+                        continue;
+                    }
+
                     if (cdnEntry.MarkedForCleanup)
                     {
                         // We add metadata files to a list to delete after we iterate here (removes stream/io jank)
