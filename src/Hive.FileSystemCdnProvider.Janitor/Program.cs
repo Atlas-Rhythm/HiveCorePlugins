@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace Hive.FileSystemCdnProvider.Janitor
      * 
      * This was designed to be a separate application which runs on a crontable, separate from main Hive.
      */
-    public class Program
+    public static class Program
     {
         /*
          * Janitor arguments:
@@ -21,11 +22,22 @@ namespace Hive.FileSystemCdnProvider.Janitor
          * 1 - CDN Metadata subfolder ("CdnMetadataSubfolder" plugin config key)
          * 2 - CDN Object subfolder ("CdnObjectsSubfolder" plugin config key)
          */
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types",
+            Justification = "The Janitor does not care about exceptions, and will simply try again on next execution.")]
         public static async Task Main(string[] args)
         {
+            // This should NEVER happen, but Visual Studio is yelling at me
+            if (args == null)
+            {
+                throw new ArgumentNullException(nameof(args));
+            }
+
             if (args.Length is not 3)
             {
-                throw new ArgumentException("The Janitor requires 3 text arguments in this order: The absolute path to the Hive installation, the relative CDN Metadata subfolder, and the relative CDN Objects subfolder.");
+                throw new ArgumentException("The Janitor requires 3 text arguments in this order: "
+                    + "The absolute path to the Hive installation, "
+                    + "the relative CDN Metadata subfolder, "
+                    + "and the relative CDN Objects subfolder.");
             }
 
             // Grab our directory infos and throw if any dont exist
@@ -72,25 +84,26 @@ namespace Hive.FileSystemCdnProvider.Janitor
 
                     if (cdnEntry.MarkedForCleanup)
                     {
-                        // We add metadata files to a list to delete after we iterate here (removes stream/io jank)
-                        metadataFilesToRemove.Add(metadataFile.FullName);
-
                         // Unique ID is the metadata file without the extension.
-                        var uniqueId = metadataFile.Name.Replace(FileSystemMetadataWrapper.MetadataExtension, "");
+                        var uniqueId = metadataFile.Name.Replace(FileSystemMetadataWrapper.MetadataExtension, "",
+                            StringComparison.InvariantCultureIgnoreCase);
 
                         // Delete the folder with the object data
-                        var objectDirectory = new DirectoryInfo(Path.Combine(cdnObjectsFolder.FullName, metadataFile.Name));
+                        var objectDirectory = new DirectoryInfo(Path.Combine(cdnObjectsFolder.FullName, uniqueId));
                         if (objectDirectory.Exists)
                         {
                             objectDirectory.Delete(true);
                         }
+
+                        // Only flag metadata file for removal after CDN objects were successfully removed.
+                        metadataFilesToRemove.Add(metadataFile.FullName);
                     }
                     // Files can stay in CDN a little bit longer so we mark them for removal on the next sweep
                     else if (cdnEntry.ExpiresAt >= currentInstant)
                     {
                         cdnEntry.MarkedForCleanup = true;
 
-                        await JsonSerializer.SerializeAsync(stream, cdnEntry);
+                        await JsonSerializer.SerializeAsync(stream, cdnEntry).ConfigureAwait(false);
                     }
                 }
                 catch
