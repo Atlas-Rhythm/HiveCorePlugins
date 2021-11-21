@@ -116,7 +116,15 @@ namespace Hive.FileSystemCdnProvider.Janitor
             // Once all metadata files are read from and accounted for, remove the ones marked for cleanup
             foreach (var metadataFile in metadataFilesToRemove)
             {
-                File.Delete(metadataFile);
+                try
+                {
+                    File.Delete(metadataFile);
+                }
+                catch
+                {
+                    // Metadata files can also stay in CDN a little longer, we'll get 'em next time
+                    continue;
+                }
             }
         }
     }
