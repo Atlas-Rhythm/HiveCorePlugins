@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Hive.Services;
 using Microsoft.AspNetCore.Http;
@@ -179,10 +179,22 @@ namespace Hive.FileSystemCdnProvider
             // Get CDN unique ID and object name
             var cdnUniqueId = link.UniqueId;
 
-            // Slap everything together and return the result
-            var cdnUrl = $"{baseUrl}/{cdnUniqueId}/{Uri.EscapeDataString(metadata.CdnEntry.ObjectName)}";
+            // Using a StringBuilder for (probably) better performance, and also the next little bit
+            var cdnUrlBuilder = new StringBuilder(baseUrl);
 
-            return new Uri(cdnUrl);
+            // Place an ending "/" if the base url (whether from config or built from request) does not include one
+            if (!baseUrl.EndsWith("/", StringComparison.InvariantCultureIgnoreCase))
+            {
+                _ = cdnUrlBuilder.Append('/');
+            }
+
+            // Build the rest of the URI
+            _ = cdnUrlBuilder
+                .Append(cdnUniqueId)
+                .Append('/')
+                .Append(Uri.EscapeDataString(metadata.CdnEntry.ObjectName));
+
+            return new Uri(cdnUrlBuilder.ToString());
         }
 
         public async Task<string> GetObjectName(CdnObject link)
