@@ -2,14 +2,13 @@ name: .NET Core
 
 on: [push, pull_request]
 
+permissions: read-all
+
 jobs:
   build:
     # This obtained from: https://docs.github.com/en/free-pro-team@latest/actions/guides/creating-postgresql-service-containers
     # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
-
-    permissions:
-      packages: read
 
     steps:
       - name: Checkout
