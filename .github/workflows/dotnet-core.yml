@@ -32,7 +32,8 @@ jobs:
       - name: Build
         run: dotnet build --no-restore -c Release -clp:NoSummary
       - name: Pack artifacts
-        run: tools/plugins/buildOrPackPlugins.ps1
+        shell: pwsh
+        run: pwsh tools/plugins/buildOrPackPlugins.ps1
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
