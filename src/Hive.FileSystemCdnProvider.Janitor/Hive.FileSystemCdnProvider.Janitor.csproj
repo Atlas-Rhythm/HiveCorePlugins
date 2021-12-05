@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <SelfContained>True</SelfContained>
+    <PublishSelfContained>True</PublishSelfContained>
     <PublishSingleFile>True</PublishSingleFile>
     <PublishTrimmed>True</PublishTrimmed>
   </PropertyGroup>
