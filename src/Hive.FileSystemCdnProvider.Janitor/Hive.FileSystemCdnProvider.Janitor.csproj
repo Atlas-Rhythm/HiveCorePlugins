@@ -8,7 +8,6 @@
   <PropertyGroup>
     <PublishSelfContained>True</PublishSelfContained>
     <PublishSingleFile>True</PublishSingleFile>
-    <PublishTrimmed>True</PublishTrimmed>
   </PropertyGroup>
   
   <ItemGroup>
