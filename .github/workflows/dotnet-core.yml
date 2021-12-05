@@ -31,3 +31,10 @@ jobs:
         run: dotnet restore -p:Configuration=Release -clp:NoSummary
       - name: Build
         run: dotnet build --no-restore -c Release -clp:NoSummary
+      - name: Pack artifacts
+        run: tools/plugins/buildOrPackPlugins.ps1
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: artifacts/zips
