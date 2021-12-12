@@ -1,5 +1,6 @@
 ﻿using DryIoc;
 using Hive.Plugins;
+using Hive.Tags.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -14,9 +15,9 @@ namespace Hive.Tags
         public Startup(IConfiguration config)
             => Configuration = config;
 
-        public void ConfigureContainer(IContainer container)
+        public static void ConfigureContainer(IContainer container)
         {
-            // TODO: Register your services in the IContainer
+            container.RegisterCustomFunctions();
         }
 
         public /*async Task*/ void PreConfigure/*Async*/()
