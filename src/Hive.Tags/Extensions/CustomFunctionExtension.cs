@@ -13,14 +13,14 @@ namespace Hive.Tags.Extensions
     {
         public static void RegisterCustomFunctions(this IContainer container)
         {
+            container.RegisterInstance<(string, Delegate)>(("getTags", GetTags));
+
             container.RegisterInstance<(string, Delegate)>(("hasTag", HasTag));
 
-            // TODO: MathExpr does not currently support sequences, so the below methods may not be accessible
+            // TODO: MathExpr does not currently support sequences, so the below functions may not be accessible
             container.RegisterInstance<(string, Delegate)>(("hasAnyTags", HasAnyTag));
 
             container.RegisterInstance<(string, Delegate)>(("hasAllTags", HasAllTags));
-
-            container.RegisterInstance<(string, Delegate)>(("getTags", GetTags));
         }
 
         // Returns true iff the mod has the given tag
