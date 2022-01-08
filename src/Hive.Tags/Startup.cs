@@ -1,6 +1,8 @@
 ﻿using DryIoc;
+using Hive.Controllers;
 using Hive.Plugins;
 using Hive.Tags.Extensions;
+using Hive.Tags.Plugins;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +20,9 @@ namespace Hive.Tags
         public static void ConfigureContainer(IContainer container)
         {
             container.RegisterCustomFunctions();
+
+            // REVIEW: Is this the right Reuse?
+            container.Register<IUploadPlugin, TagUploadPlugin>(Reuse.Scoped);
         }
 
         public /*async Task*/ void PreConfigure/*Async*/()
