@@ -1,7 +1,10 @@
 ﻿using DryIoc;
 using Hive.Controllers;
+using Hive.Graphing;
+using Hive.Graphing.Types;
 using Hive.Plugins;
 using Hive.Tags.Extensions;
+using Hive.Tags.Graphing;
 using Hive.Tags.Plugins;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,6 +26,8 @@ namespace Hive.Tags
 
             // REVIEW: Is this the right Reuse?
             container.Register<IUploadPlugin, TagUploadPlugin>(Reuse.Scoped);
+
+            container.Register<ICustomHiveGraph<ModType>, TagsGraphType>(Reuse.Singleton);
         }
 
         public /*async Task*/ void PreConfigure/*Async*/()
