@@ -9,8 +9,7 @@ namespace Hive.Tags.Extensions
         /// <summary>
         /// The key in <see cref="ArbitraryAdditionalData"/> from which tags are stored/retrieved.
         /// </summary>
-        // Using "Hive_Tags" instead of "Hive.Tags" to hopefully prevent "ctx.Mod.AdditionalData.Hive.Tags...."
-        public const string AdditionalDataKey = "Hive_Tags";
+        public const string AdditionalDataKey = "Tags";
 
         /// <summary>
         /// Retrieves all tag information attached to the specified <see cref="Mod"/>.
