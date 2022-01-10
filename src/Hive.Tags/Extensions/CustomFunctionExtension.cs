@@ -27,20 +27,15 @@ namespace Hive.Tags.Extensions
         private static bool HasTag(Mod mod, string tag) => GetTags(mod).Contains(tag);
 
         // Returns true iff the mod has any of the given tags
-        private static bool HasAnyTag(Mod mod, IEnumerable<string> tags)
-        {
-            var assignedTags = GetTags(mod);
-
-            return assignedTags.Any(tag => tags.Contains(tag));
-        }
+        private static bool HasAnyTag(Mod mod, IEnumerable<string> tags) => GetTags(mod).Any(t => tags.Contains(t));
 
         // Returns true iff the mod has all of the given tags
         private static bool HasAllTags(Mod mod, IEnumerable<string> tags)
         {
             var assignedTags = GetTags(mod);
 
-            // By default, IEnumerable<T>.All returns true if the collection is empty; we want the opposite
-            return assignedTags.Any() && tags.All(tag => assignedTags.Contains(tag));
+            // REVIEW: This returns true if "tags" is empty. Should this be the case?
+            return tags.All(tag => assignedTags.Contains(tag));
         }
 
         // Retrieves all tags attached to the given mod
