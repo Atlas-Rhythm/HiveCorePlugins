@@ -24,7 +24,7 @@ namespace Hive.Tags.Graphing
             // REVIEW: Localize description field?
             _ = graphType.Field<ListGraphType<StringGraphType>>(
                 "tags",
-                "(Exposed by Hive.Tags) List of tags assigned to this mod.",
+                $"(Exposed by {nameof(Tags)}) List of tags assigned to this mod.",
                 resolve: ctx => ctx.Source!.GetTags()?.Tags ?? Enumerable.Empty<string>());
         }
     }
