@@ -10,6 +10,11 @@ namespace Hive.Tags.Plugins
     /// Exposed plugin interface for a plugin, I know.
     /// </remarks>
     [Aggregable(Default = typeof(DefaultTagPlugin))]
+    // REVIEW: Is this the right way to go this?
+    //    I asked a question a while back regarding whether or not to have constraints defined in configuration, or to use a
+    //    plugin interface like the one here.
+    // REVIEW: Should the default plugin remain "yes, everything is valid" or should it use the Configuration file
+    //     like I described above?
     public interface ITagPlugin
     {
         /// <summary>
