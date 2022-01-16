@@ -10,21 +10,20 @@ namespace Hive.Tags.Plugins
     /// Exposed plugin interface for a plugin, I know.
     /// </remarks>
     [Aggregable(Default = typeof(DefaultTagPlugin))]
-    // REVIEW: Is this the right way to go this?
-    //    I asked a question a while back regarding whether or not to have constraints defined in configuration, or to use a
-    //    plugin interface like the one here.
-    // REVIEW: Should the default plugin remain "yes, everything is valid" or should it use the Configuration file
-    //     like I described above?
     public interface ITagPlugin
     {
         /// <summary>
-        /// Returns true if the provided list of tags is valid, false otherwise.
+        /// Returns <c>true</c> if the provided list of tags is valid, <c>false</c> otherwise.
         /// </summary>
-        /// <param name="tags">List of tags to validate</param>
+        /// <remarks>
+        /// If the plugin can safely fix an otherwise invalid list of tags, the plugin should make a good attempt
+        /// at modifying <paramref name="mutableTags"/> and return <c>true</c> on a successful fix.
+        /// </remarks>
+        /// <param name="mutableTags">List of mutable tags to validate.</param>
         /// <param name="validationFailureInfo">Information about the rejection, if any.</param>
-        /// <returns></returns>
+        /// <returns>Whether or not the provided list of tags is valid.</returns>
         [return: StopIfReturns(false)]
-        bool AreTagsValid(IList<string> tags, [ReturnLast] out object? validationFailureInfo)
+        bool AreTagsValid(IList<string> mutableTags, [ReturnLast] out object? validationFailureInfo)
         {
             validationFailureInfo = null;
 
