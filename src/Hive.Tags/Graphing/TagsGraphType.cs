@@ -19,8 +19,6 @@ namespace Hive.Tags.Graphing
                 throw new ArgumentNullException(nameof(graphType));
             }
 
-            // REVIEW: Should this field be at the top level, or should I wrap it in an "additionalData" object?
-            //    Alternatively, should this be replaced by a blanket "additionalData" GQL object on Hive's end?
             // REVIEW: Localize description field?
             _ = graphType.Field<ListGraphType<StringGraphType>>(
                 "tags",

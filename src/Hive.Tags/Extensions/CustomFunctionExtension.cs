@@ -34,7 +34,6 @@ namespace Hive.Tags.Extensions
         {
             var assignedTags = GetTags(mod);
 
-            // REVIEW: This returns true if "tags" is empty. Should this be the case?
             return tags.All(tag => assignedTags.Contains(tag));
         }
 

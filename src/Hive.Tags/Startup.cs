@@ -22,8 +22,7 @@ namespace Hive.Tags
         {
             container.RegisterCustomFunctions();
 
-            // REVIEW: Is this the right Reuse?
-            container.Register<IUploadPlugin, TagUploadPlugin>(Reuse.Scoped);
+            container.Register<IUploadPlugin, TagUploadPlugin>(Reuse.Singleton);
 
             container.Register<ICustomHiveGraph<ModType>, TagsGraphType>(Reuse.Singleton);
         }
