@@ -1,7 +1,5 @@
 ﻿using DryIoc;
 using Hive.Plugins;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,29 +13,14 @@ namespace Hive.PermissionQuery
         public Startup(IConfiguration config)
             => Configuration = config;
 
-        /*
-        public void ConfigureServices(IServiceCollection services)
-        {
-            // TODO: Use this only for other libraries which use MSDI for injection
-        }
-        */
 
-        public void ConfigureContainer(IContainer container)
-        {
-            // TODO: Register your services in the IContainer
-        }
+        public static void ConfigureServices(IServiceCollection services)
+            // REVIEW: Does Hive automatically add REST controllers in plugins?
+            => _ = services.AddControllers();
 
-        public /*async Task*/ void PreConfigure/*Async*/()
+        public static void ConfigureContainer(IContainer container)
         {
-            // TODO: Perform any possibly-asynchronous setup that needs to happen before Configure.
-            //   If this method needs to be async, it MUST be named PreConfigureAsync and return either
-            // Task or ValueTask. Both the sync and async versions may take any services as parameters.
-            // They are automatically injected, much like Configure.
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            // TODO: Configure the application
+            // TODO: Configuration
         }
     }
 }

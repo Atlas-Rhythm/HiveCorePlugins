@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using Hive.Extensions;
 using Hive.Permissions;
@@ -35,17 +36,19 @@ namespace Hive.PermissionQuery
         public async Task<ActionResult<IDictionary<string, bool>>> Query([FromBody] string[] actions, [FromBody] PermissionContext context)
         {
             if (actions is null)
-            {
-                // "Hey, give me some actions to process"
-                return BadRequest(nameof(actions));
-            }
+                return BadRequest("No list of actions to process.");
 
             // REVIEW: Should I return BadRequest on missing context?
             context ??= new PermissionContext();
 
             // TODO: Validate actions against a config whitelist.
             // REVIEW: Refuse when requesting a non-whitelisted action? Only process whitelisted actions?
-            var filteredActions = actions;
+            var filteredActions = actions.Select(x => x);
+
+            if (!filteredActions.Any())
+                return BadRequest("No whitelisted actions to process.");
+
+            log.Information("Querying some permission actions: {actions}", actions);
 
             // REVIEW: Should the backend automatically fill User context like this? Or should it be left to the front end?
             var user = await HttpContext.GetHiveUser(proxyAuth).ConfigureAwait(false);
