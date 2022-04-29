@@ -1,5 +1,4 @@
-﻿using DryIoc;
-using Hive.Plugins;
+﻿using Hive.Plugins;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,13 +13,13 @@ namespace Hive.PermissionQuery
             => Configuration = config;
 
 
-        public static void ConfigureServices(IServiceCollection services)
-            // REVIEW: Does Hive automatically add REST controllers in plugins?
-            => _ = services.AddControllers();
-
-        public static void ConfigureContainer(IContainer container)
+        public void ConfigureServices(IServiceCollection services)
         {
-            // TODO: Configuration
+            _ = services.AddOptions<PermissionQueryOptions>()
+                .Bind(Configuration);
+
+            // REVIEW: Does Hive automatically add REST controllers in plugins?
+            _ = services.AddControllers();
         }
     }
 }

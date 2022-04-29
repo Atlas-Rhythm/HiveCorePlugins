@@ -6,6 +6,7 @@ using Hive.Extensions;
 using Hive.Permissions;
 using Hive.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace Hive.PermissionQuery
 {
@@ -16,20 +17,22 @@ namespace Hive.PermissionQuery
         private readonly Serilog.ILogger log;
         private readonly IProxyAuthenticationService proxyAuth;
         private readonly PermissionsManager<PermissionContext> permissions;
+        private readonly IOptions<PermissionQueryOptions> options;
 
         /// <summary>
         /// Create with DI
         /// </summary>
         /// <param name="log"></param>
         /// <param name="proxyAuth"></param>
-        /// <param name="context"></param>
         /// <param name="permissions"></param>
+        /// <param name="options"></param>
         public PermissionQueryController([DisallowNull] Serilog.ILogger log, IProxyAuthenticationService proxyAuth,
-            PermissionsManager<PermissionContext> permissions)
+            PermissionsManager<PermissionContext> permissions, IOptions<PermissionQueryOptions> options)
         {
             this.log = log;
             this.proxyAuth = proxyAuth;
             this.permissions = permissions;
+            this.options = options;
         }
 
         [HttpGet("query")]
@@ -41,9 +44,8 @@ namespace Hive.PermissionQuery
             // REVIEW: Should I return BadRequest on missing context?
             context ??= new PermissionContext();
 
-            // TODO: Validate actions against a config whitelist.
-            // REVIEW: Refuse when requesting a non-whitelisted action? Only process whitelisted actions?
-            var filteredActions = actions.Select(x => x);
+            // REVIEW: Should we refuse outright with a non-whitelisted action?
+            var filteredActions = actions.Where(it => options.Value.WhitelistedActions.Contains(it));
 
             if (!filteredActions.Any())
                 return BadRequest("No whitelisted actions to process.");
