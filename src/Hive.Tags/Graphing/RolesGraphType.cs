@@ -8,22 +8,21 @@ using Hive.Tags.Extensions;
 namespace Hive.Tags.Graphing
 {
     /// <summary>
-    /// The GQL representation of Tags in a <see cref="Models.Mod"/>.
+    /// The GQL representation of Roles in a <see cref="Models.User"/>.
     /// </summary>
-    public class TagsGraphType : ICustomHiveGraph<ModType>
+    public class RolesGraphType : ICustomHiveGraph<UserType>
     {
-        public void Configure(ModType graphType)
+        public void Configure(UserType graphType)
         {
             if (graphType == null)
             {
                 throw new ArgumentNullException(nameof(graphType));
             }
 
-            // REVIEW: Localize description field?
             _ = graphType.Field<ListGraphType<StringGraphType>>(
-                "tags",
-                $"(Exposed by {nameof(Tags)}) List of tags assigned to this mod.",
-                resolve: ctx => ctx.Source?.GetTags() ?? Enumerable.Empty<string>());
+                "roles",
+                $"(Exposed by {nameof(Tags)} List of roles assigned to this user.",
+                resolve: ctx => ctx.Source?.GetRoles() ?? Enumerable.Empty<string>());
         }
     }
 }

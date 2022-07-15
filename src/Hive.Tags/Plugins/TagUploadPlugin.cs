@@ -22,7 +22,7 @@ namespace Hive.Tags.Plugins
             {
                 var aggregated = tagPlugins.Instance;
 
-                return aggregated.AreTagsValid(modTags.Tags, out validationFailureInfo);
+                return aggregated.AreTagsValid(modTags, out validationFailureInfo);
             }
 
             validationFailureInfo = null;
