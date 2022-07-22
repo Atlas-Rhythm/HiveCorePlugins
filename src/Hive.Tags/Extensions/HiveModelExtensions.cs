@@ -28,7 +28,7 @@ namespace Hive.Tags.Extensions
         /// <exception cref="ArgumentNullException"><paramref name="mod"/> is null.</exception>
         public static IList<string>? GetTags(this Mod mod)
             => mod is not null
-            ? mod.AdditionalData.Get<IList<string>>(TagsAdditionalDataKey)
+            ? mod.AdditionalData.Get<List<string>>(TagsAdditionalDataKey)
             : throw new ArgumentNullException(nameof(mod));
 
         /// <summary>

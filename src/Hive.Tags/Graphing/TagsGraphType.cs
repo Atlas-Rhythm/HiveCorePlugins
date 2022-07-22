@@ -19,7 +19,6 @@ namespace Hive.Tags.Graphing
                 throw new ArgumentNullException(nameof(graphType));
             }
 
-            // REVIEW: Localize description field?
             _ = graphType.Field<ListGraphType<StringGraphType>>(
                 "tags",
                 $"(Exposed by {nameof(Tags)}) List of tags assigned to this mod.",

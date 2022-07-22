@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Hive.Controllers;
 using Hive.Models;
@@ -14,12 +15,14 @@ namespace Hive.Tags.Plugins
         public void ExposeUserInfo(Dictionary<string, object> data, ArbitraryAdditionalData userData)
         {
             // REVIEW: Is there merit to throwing an exception rather than peacefully exiting?
-            if (userData == null)
-                return;
+            if (userData is null)
+            {
+                throw new ArgumentNullException(nameof(userData));
+            }
 
             data ??= new();
 
-            var roles = userData.Get<IList<string>>(HiveModelExtensions.RolesAdditionalDataKey);
+            var roles = userData.Get<List<string>>(HiveModelExtensions.RolesAdditionalDataKey);
 
             if (roles != null)
             {
