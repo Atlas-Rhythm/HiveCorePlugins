@@ -23,8 +23,10 @@ namespace Hive.Tags
             container.RegisterCustomFunctions();
 
             container.Register<IUploadPlugin, TagUploadPlugin>(Reuse.Singleton);
+            container.Register<IUserPlugin, RoleUserPlugin>(Reuse.Singleton);
 
             container.Register<ICustomHiveGraph<ModType>, TagsGraphType>(Reuse.Singleton);
+            container.Register<ICustomHiveGraph<UserType>, RolesGraphType>(Reuse.Singleton);
         }
     }
 }
