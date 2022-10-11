@@ -34,7 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{85BD8051
 		tools\plugins\publishProfile.pubxml = tools\plugins\publishProfile.pubxml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hive.PermissionQuery", "Hive.PermissionQuery\Hive.PermissionQuery.csproj", "{DF24ACE6-C9BD-4573-B0E7-3ACBDBFDF262}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hive.PermissionQuery", "src\Hive.PermissionQuery\Hive.PermissionQuery.csproj", "{72879465-FE87-4F28-839D-A9A6A1922D50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,10 +62,10 @@ Global
 		{28ABCFF1-201E-4C0B-9456-AE76D43A36B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28ABCFF1-201E-4C0B-9456-AE76D43A36B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28ABCFF1-201E-4C0B-9456-AE76D43A36B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DF24ACE6-C9BD-4573-B0E7-3ACBDBFDF262}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DF24ACE6-C9BD-4573-B0E7-3ACBDBFDF262}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DF24ACE6-C9BD-4573-B0E7-3ACBDBFDF262}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DF24ACE6-C9BD-4573-B0E7-3ACBDBFDF262}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72879465-FE87-4F28-839D-A9A6A1922D50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72879465-FE87-4F28-839D-A9A6A1922D50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72879465-FE87-4F28-839D-A9A6A1922D50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72879465-FE87-4F28-839D-A9A6A1922D50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

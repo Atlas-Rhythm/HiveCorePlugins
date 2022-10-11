@@ -14,12 +14,7 @@ namespace Hive.PermissionQuery
 
 
         public void ConfigureServices(IServiceCollection services)
-        {
-            _ = services.AddOptions<PermissionQueryOptions>()
+            => _ = services.AddOptions<PermissionQueryOptions>()
                 .Bind(Configuration);
-
-            // REVIEW: Does Hive automatically add REST controllers in plugins?
-            _ = services.AddControllers();
-        }
     }
 }

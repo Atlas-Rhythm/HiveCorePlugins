@@ -3,8 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Hive.Extensions;
+using Hive.Models;
 using Hive.Permissions;
 using Hive.Services;
+using Hive.Services.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -18,6 +20,9 @@ namespace Hive.PermissionQuery
         private readonly IProxyAuthenticationService proxyAuth;
         private readonly PermissionsManager<PermissionContext> permissions;
         private readonly IOptions<PermissionQueryOptions> options;
+        private readonly ModService modService;
+        private readonly ChannelService channelService;
+        private readonly HiveContext context;
 
         /// <summary>
         /// Create with DI
@@ -27,42 +32,72 @@ namespace Hive.PermissionQuery
         /// <param name="permissions"></param>
         /// <param name="options"></param>
         public PermissionQueryController([DisallowNull] Serilog.ILogger log, IProxyAuthenticationService proxyAuth,
-            PermissionsManager<PermissionContext> permissions, IOptions<PermissionQueryOptions> options)
+            PermissionsManager<PermissionContext> permissions, IOptions<PermissionQueryOptions> options,
+            ModService modService, ChannelService channelService, HiveContext context)
         {
             this.log = log;
             this.proxyAuth = proxyAuth;
             this.permissions = permissions;
             this.options = options;
+            this.modService = modService;
+            this.channelService = channelService;
+            this.context = context;
         }
 
         [HttpGet("query")]
-        public async Task<ActionResult<IDictionary<string, bool>>> Query([FromBody] string[] actions, [FromBody] PermissionContext context)
+        public async Task<ActionResult<IDictionary<string, bool>>> Query([FromBody] string[] actions,
+            [FromBody] ModIdentifier? modId, [FromBody] string? channelId)
         {
             if (actions is null)
                 return BadRequest("No list of actions to process.");
 
-            // REVIEW: Should I return BadRequest on missing context?
-            context ??= new PermissionContext();
+            var context = new PermissionContext
+            {
+                User = await HttpContext.GetHiveUser(proxyAuth).ConfigureAwait(false)
+            };
 
-            // REVIEW: Should we refuse outright with a non-whitelisted action?
-            var filteredActions = actions.Where(it => options.Value.WhitelistedActions.Contains(it));
+            if (modId != null)
+            {
+                // TODO: Grabbing a mod by a ModIdentifier should *REALLY* be part of ModService!
+                //   You would think ModService could do that, but apparently not.
+                context.Mod = await context.Mods.AsTracking()
+                    .Include(m => m.Localizations)
+                    .Include(m => m.Channel)
+                    .Include(m => m.SupportedVersions)
+                    .Include(m => m.Uploader)
+                    .Include(m => m.Authors)
+                    .Include(m => m.Contributors)
+                    .AsSingleQuery()
+                    // REVIEW: ToString() Mod.Version, or parse ModIdentifier.Version?
+                    .Where(m => m.ReadableId == modId.ID && m.Version.ToString() == modId.Version)
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
+            }
 
-            if (!filteredActions.Any())
-                return BadRequest("No whitelisted actions to process.");
+            if (channelId != null)
+            {
+                var channelQuery = await channelService.GetChannel(channelId, context.User).ConfigureAwait(false);
+
+                context.Channel = channelQuery.Value;
+            }
 
             log.Information("Querying some permission actions: {actions}", actions);
-
-            // REVIEW: Should the backend automatically fill User context like this? Or should it be left to the front end?
-            var user = await HttpContext.GetHiveUser(proxyAuth).ConfigureAwait(false);
-            context.User = user;
 
             // Key: Action, Value: Can the action be performed
             var results = new Dictionary<string, bool>();
 
-            foreach (var action in filteredActions)
+            foreach (var action in actions)
             {
-                // REVIEW: Should parse states be used? What would that look like?
-                results.Add(action, permissions.CanDo(action, context));
+                // REVIEW: Is it a good idea to assume an empty whitelist means the instance owner wants every permission rule available to query?
+                if (options.Value.WhitelistedActions.Contains(action) || options.Value.WhitelistedActions.Count == 0)
+                {
+                    // REVIEW: Should parse states be used? What would that look like?
+                    results.Add(action, permissions.CanDo(action, context));
+                }
+                else
+                {
+                    results.Add(action, false);
+                }
             }
 
             return results;
