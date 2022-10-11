@@ -8,6 +8,7 @@ using Hive.Permissions;
 using Hive.Services;
 using Hive.Services.Common;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Hive.PermissionQuery
