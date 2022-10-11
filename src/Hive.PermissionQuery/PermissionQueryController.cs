@@ -41,7 +41,6 @@ namespace Hive.PermissionQuery
             this.options = options;
             this.modService = modService;
             this.channelService = channelService;
-            this.hiveContext = hiveContext;
         }
 
         [HttpGet("query")]
