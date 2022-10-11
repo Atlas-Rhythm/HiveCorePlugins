@@ -23,7 +23,6 @@ namespace Hive.PermissionQuery
         private readonly IOptions<PermissionQueryOptions> options;
         private readonly ModService modService;
         private readonly ChannelService channelService;
-        private readonly HiveContext hiveContext;
 
         /// <summary>
         /// Create with DI
@@ -34,7 +33,7 @@ namespace Hive.PermissionQuery
         /// <param name="options"></param>
         public PermissionQueryController([DisallowNull] Serilog.ILogger log, IProxyAuthenticationService proxyAuth,
             PermissionsManager<PermissionContext> permissions, IOptions<PermissionQueryOptions> options,
-            ModService modService, ChannelService channelService, HiveContext hiveContext)
+            ModService modService, ChannelService channelService)
         {
             this.log = log;
             this.proxyAuth = proxyAuth;
@@ -59,20 +58,9 @@ namespace Hive.PermissionQuery
 
             if (modId != null)
             {
-                // TODO: Grabbing a mod by a ModIdentifier should *REALLY* be part of ModService!
-                //   You would think ModService could do that, but apparently not.
-                context.Mod = await hiveContext.Mods.AsTracking()
-                    .Include(m => m.Localizations)
-                    .Include(m => m.Channel)
-                    .Include(m => m.SupportedVersions)
-                    .Include(m => m.Uploader)
-                    .Include(m => m.Authors)
-                    .Include(m => m.Contributors)
-                    .AsSingleQuery()
-                    // REVIEW: ToString() Mod.Version, or parse ModIdentifier.Version?
-                    .Where(m => m.ReadableID == modId.ID && m.Version.ToString() == modId.Version)
-                    .FirstOrDefaultAsync()
-                    .ConfigureAwait(false);
+                var modQuery = await modService.GetMod(context.User, modId).ConfigureAwait(false);
+
+                context.Mod = modQuery.Value;
             }
 
             if (channelId != null)
