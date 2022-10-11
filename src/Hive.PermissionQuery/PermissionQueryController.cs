@@ -70,7 +70,7 @@ namespace Hive.PermissionQuery
                     .Include(m => m.Contributors)
                     .AsSingleQuery()
                     // REVIEW: ToString() Mod.Version, or parse ModIdentifier.Version?
-                    .Where(m => m.ReadableId == modId.ID && m.Version.ToString() == modId.Version)
+                    .Where(m => m.ReadableID == modId.ID && m.Version.ToString() == modId.Version)
                     .FirstOrDefaultAsync()
                     .ConfigureAwait(false);
             }
