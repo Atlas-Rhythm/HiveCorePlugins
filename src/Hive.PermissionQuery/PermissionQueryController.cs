@@ -43,6 +43,14 @@ namespace Hive.PermissionQuery
             this.channelService = channelService;
         }
 
+        /// <summary>
+        /// Queries the permission system for each of the given <paramref name="actions"/>, with additional context
+        /// given by <paramref name="modId"/>, <paramref name="channelId"/>, and any active <see cref="User"/>.
+        /// </summary>
+        /// <param name="actions">List of permission rules to query.</param>
+        /// <param name="modId">A <see cref="ModIdentifier"/> as context for the Permission System.</param>
+        /// <param name="channelId">A Channel ID as context for the Permission System.</param>
+        /// <returns>For each action given to the endpoint, whether or not the user can perform that action.</returns>
         [HttpGet("query")]
         public async Task<ActionResult<IDictionary<string, bool>>> Query([FromBody] string[] actions,
             [FromBody] ModIdentifier? modId, [FromBody] string? channelId)
