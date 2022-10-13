@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
 using Hive.Extensions;
 using Hive.Models;
+using Hive.PermissionQuery.Models;
 using Hive.Permissions;
 using Hive.Services;
 using Hive.Services.Common;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Hive.PermissionQuery
@@ -52,10 +52,12 @@ namespace Hive.PermissionQuery
         /// <param name="channelId">A Channel ID as context for the Permission System.</param>
         /// <returns>For each action given to the endpoint, whether or not the user can perform that action.</returns>
         [HttpGet("query")]
-        public async Task<ActionResult<IDictionary<string, bool>>> Query([FromBody] string[] actions,
-            [FromBody] ModIdentifier? modId, [FromBody] string? channelId)
+        public async Task<ActionResult<IDictionary<string, bool>>> Query([FromBody] QueryParams queryParams)
         {
-            if (actions is null)
+            if (queryParams is null)
+                throw new ArgumentNullException(nameof(queryParams));
+
+            if (queryParams.Actions is null)
                 return BadRequest("No list of actions to process.");
 
             var context = new PermissionContext
@@ -63,26 +65,26 @@ namespace Hive.PermissionQuery
                 User = await HttpContext.GetHiveUser(proxyAuth).ConfigureAwait(false)
             };
 
-            if (modId != null)
+            if (queryParams.Mod != null)
             {
-                var modQuery = await modService.GetMod(context.User, modId).ConfigureAwait(false);
+                var modQuery = await modService.GetMod(context.User, queryParams.Mod).ConfigureAwait(false);
 
                 context.Mod = modQuery.Value;
             }
 
-            if (channelId != null)
+            if (queryParams.Channel != null)
             {
-                var channelQuery = await channelService.GetChannel(channelId, context.User).ConfigureAwait(false);
+                var channelQuery = await channelService.GetChannel(queryParams.Channel, context.User).ConfigureAwait(false);
 
                 context.Channel = channelQuery.Value;
             }
 
-            log.Information("Querying some permission actions: {actions}", actions);
+            log.Information("Querying some permission actions: {actions}", queryParams.Actions);
 
             // Key: Action, Value: Can the action be performed
             var results = new Dictionary<string, bool>();
 
-            foreach (var action in actions)
+            foreach (var action in queryParams.Actions)
             {
                 // REVIEW: Is it a good idea to assume an empty whitelist means the instance owner wants every permission rule available to query?
                 if (options.Value.WhitelistedActions.Contains(action) || options.Value.WhitelistedActions.Count == 0)
