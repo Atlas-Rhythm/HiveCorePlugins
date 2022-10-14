@@ -35,7 +35,7 @@ namespace Hive.Tags.Plugins
         {
             validationFailureInfo = null;
 
-            return false;
+            return true;
         }
     }
 }
