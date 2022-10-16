@@ -26,7 +26,7 @@ namespace Hive.Tags.Extensions
         /// <param name="mod">The mod to extract tag information from.</param>
         /// <returns>The tags attached to a mod.</returns>
         public static IList<string>? GetTags(this Mod mod)
-            => mod is not null && mod.AdditionalData.TryGetValue<IList<string>>(RolesAdditionalDataKey, out var tags)
+            => mod is not null && mod.AdditionalData.TryGetValue<List<string>>(RolesAdditionalDataKey, out var tags)
             ? tags
             : null;
 
@@ -53,7 +53,7 @@ namespace Hive.Tags.Extensions
         /// <param name="user">The user to extract role information from.</param>
         /// <returns>The roles attached to the given user</returns>
         public static IList<string>? GetRoles(this User user)
-            => user is not null && user.AdditionalData.TryGetValue<IList<string>>(RolesAdditionalDataKey, out var roles)
+            => user is not null && user.AdditionalData.TryGetValue<List<string>>(RolesAdditionalDataKey, out var roles)
             ? roles
             : null;
 
