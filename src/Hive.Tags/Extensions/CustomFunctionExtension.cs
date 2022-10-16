@@ -1,4 +1,5 @@
 ﻿using DryIoc;
+using Hive.Extensions;
 using Hive.Models;
 using System;
 using System.Collections.Generic;
@@ -13,22 +14,18 @@ namespace Hive.Tags.Extensions
     {
         public static void RegisterCustomFunctions(this IContainer container)
         {
-            container.RegisterInstance<(string, Delegate)>(("getTags", GetTags));
+            container.RegisterBuiltinFunction("getTags", GetTags);
+            container.RegisterBuiltinFunction("hasTag", HasTag);
 
-            container.RegisterInstance<(string, Delegate)>(("hasTag", HasTag));
-
-            container.RegisterInstance<(string, Delegate)>(("getRoles", GetRoles));
-
-            container.RegisterInstance<(string, Delegate)>(("hasRole", HasRole));
+            container.RegisterBuiltinFunction("getRoles", GetRoles);
+            container.RegisterBuiltinFunction("hasRole", HasRole);
 
             // TODO: MathExpr does not currently support sequences, so the below functions may not be accessible
-            container.RegisterInstance<(string, Delegate)>(("hasAnyTags", HasAnyTag));
+            container.RegisterBuiltinFunction("hasAnyTags", HasAnyTag);
+            container.RegisterBuiltinFunction("hasAllTags", HasAllTags);
 
-            container.RegisterInstance<(string, Delegate)>(("hasAllTags", HasAllTags));
-
-            container.RegisterInstance<(string, Delegate)>(("hasAnyRoles", HasAnyRole));
-
-            container.RegisterInstance<(string, Delegate)>(("hasAllRoles", HasAllRoles));
+            container.RegisterBuiltinFunction("hasAnyRoles", HasAnyRole);
+            container.RegisterBuiltinFunction("hasAllRoles", HasAllRoles);
         }
 
         // Returns true iff the mod has the given tag
