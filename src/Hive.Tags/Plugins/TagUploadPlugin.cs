@@ -26,7 +26,7 @@ namespace Hive.Tags.Plugins
             }
 
             validationFailureInfo = null;
-            return false;
+            return true;
         }
 
         // REVIEW: I am not sure if any Tag checks need to be done after data has been uploaded.
@@ -35,7 +35,7 @@ namespace Hive.Tags.Plugins
         {
             validationFailureInfo = null;
 
-            return false;
+            return true;
         }
     }
 }
