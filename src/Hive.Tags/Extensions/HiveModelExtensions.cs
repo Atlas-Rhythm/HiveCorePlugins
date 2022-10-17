@@ -25,11 +25,10 @@ namespace Hive.Tags.Extensions
         /// </remarks>
         /// <param name="mod">The mod to extract tag information from.</param>
         /// <returns>The tags attached to a mod.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="mod"/> is null.</exception>
         public static IList<string>? GetTags(this Mod mod)
-            => mod is not null
-            ? mod.AdditionalData.Get<List<string>>(TagsAdditionalDataKey)
-            : throw new ArgumentNullException(nameof(mod));
+            => mod is not null && mod.AdditionalData.TryGetValue<List<string>>(RolesAdditionalDataKey, out var tags)
+            ? tags
+            : null;
 
         /// <summary>
         /// Attaches and applies tags to a given <see cref="Mod"/>.
@@ -53,11 +52,10 @@ namespace Hive.Tags.Extensions
         /// </remarks>
         /// <param name="user">The user to extract role information from.</param>
         /// <returns>The roles attached to the given user</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="user"/>is null.</exception>
         public static IList<string>? GetRoles(this User user)
-            => user is not null
-            ? user.AdditionalData.Get<IList<string>>(RolesAdditionalDataKey)
-            : throw new ArgumentNullException(nameof(user));
+            => user is not null && user.AdditionalData.TryGetValue<List<string>>(RolesAdditionalDataKey, out var roles)
+            ? roles
+            : null;
 
         /// <summary>
         /// Attaches and applies roles to a given <see cref="User"/>.
