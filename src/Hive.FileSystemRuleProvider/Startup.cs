@@ -10,8 +10,8 @@ namespace Hive.FileSystemRuleProvider
     public class Startup
     {
         private const string SplitToken = ".";
-        private const string SubfolderConfigurationKey = "RuleSubfolder";
-        private const string SubfolderDefaultValue = "Rules";
+        private const string PathConfigurationKey = "RulePath";
+        private const string PathDefaultValue = "Rules";
 
         public IConfiguration Configuration { get; }
 
@@ -20,10 +20,10 @@ namespace Hive.FileSystemRuleProvider
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var subfolder = Configuration.GetValue(SubfolderConfigurationKey, SubfolderDefaultValue);
+            var path = Configuration.GetValue(PathConfigurationKey, PathDefaultValue);
 
             _ = services.AddTransient<IRuleProvider>(sp =>
-                    new FileSystemRuleProvider(sp.GetRequiredService<ILogger>(), SplitToken, subfolder));
+                    new FileSystemRuleProvider(sp.GetRequiredService<ILogger>(), SplitToken, path));
         }
     }
 }

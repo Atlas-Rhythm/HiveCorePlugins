@@ -16,10 +16,7 @@ namespace Hive.FileSystemCdnProvider
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly string? publicUrlBase;
 
-        private readonly string cdnObjectSubfolder;
         private readonly string cdnObjectPath;
-
-        private readonly string cdnMetadataSubfolder;
         private readonly string cdnMetadataPath;
 
         public FileSystemCdnProvider(ILogger logger, IHttpContextAccessor httpContextAccessor, IOptions<FileSystemCdnOptions> options)
@@ -32,13 +29,10 @@ namespace Hive.FileSystemCdnProvider
             this.logger = logger;
             this.httpContextAccessor = httpContextAccessor;
 
-            cdnObjectSubfolder = options.Value.CdnObjectsSubfolder;
-            cdnMetadataSubfolder = options.Value.CdnMetadataSubfolder;
-
             publicUrlBase = options.Value.PublicUrlBase?.ToString();
 
-            cdnObjectPath = Path.Combine(Directory.GetCurrentDirectory(), cdnObjectSubfolder);
-            cdnMetadataPath = Path.Combine(Directory.GetCurrentDirectory(), cdnMetadataSubfolder);
+            cdnObjectPath = Path.GetFullPath(options.Value.CdnObjectsPath);
+            cdnMetadataPath = Path.GetFullPath(options.Value.CdnMetadataPath);
 
             _ = Directory.CreateDirectory(cdnObjectPath);
             _ = Directory.CreateDirectory(cdnMetadataPath);
