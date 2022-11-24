@@ -8,7 +8,7 @@ This is a path (absolute or relative) where Hive will store uploaded mod files. 
 
 ## `CdnMetadataPath` - `string`
 
-This is path (absolute or relative) where Hive will store the metadata files for each uploaded file. By default, this is `cdn/metadata`.
+This is a path (absolute or relative) where Hive will store the metadata files for each uploaded file. By default, this is `cdn/metadata`.
 
 This is intentionally different from the Objects folder, so the maintainer can easily control access to the Objects folder and the Metadata folder.
 
