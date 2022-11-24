@@ -26,19 +26,19 @@ namespace Hive.FileSystemRuleProvider
         /// Construct a rule provider via DI.
         /// </summary>
         /// <param name="logger">Logger provided with DI.</param>
-        /// <param name="ruleSubfolder">If not empty, the rule provider will treat this as the root rule directory.</param>
+        /// <param name="rulePath">If not empty, the rule provider will treat this as the root rule directory.</param>
         /// <param name="splitToken">The token used to split rules.</param>
         /// <remarks>
         /// The <paramref name="splitToken"/> parameter, and the one given to <see cref="PermissionsManager{TContext}"/>, should always be the same.
         /// </remarks>
-        public FileSystemRuleProvider(ILogger logger, StringView splitToken, string ruleSubfolder)
+        public FileSystemRuleProvider(ILogger logger, StringView splitToken, string rulePath)
         {
             this.logger = logger;
             this.splitToken = splitToken;
 
-            ruleDirectory = Path.Combine(Directory.GetCurrentDirectory(), ruleSubfolder);
+            ruleDirectory = Path.GetFullPath(rulePath);
 
-            _ = Directory.CreateDirectory(ruleSubfolder);
+            _ = Directory.CreateDirectory(ruleDirectory);
         }
 
         /// <inheritdoc/>
