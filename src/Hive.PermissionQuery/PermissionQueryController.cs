@@ -51,7 +51,7 @@ namespace Hive.PermissionQuery
         /// <param name="modId">A <see cref="ModIdentifier"/> as context for the Permission System.</param>
         /// <param name="channelId">A Channel ID as context for the Permission System.</param>
         /// <returns>For each action given to the endpoint, whether or not the user can perform that action.</returns>
-        [HttpGet("query")]
+        [HttpPost("query")]
         public async Task<ActionResult<IDictionary<string, bool>>> Query([FromBody] QueryParams queryParams)
         {
             if (queryParams is null)
