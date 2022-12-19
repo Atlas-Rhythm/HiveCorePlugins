@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Hive.Extensions;
 using Hive.Models;
-using Hive.PermissionQuery.Models;
 using Hive.Permissions;
 using Hive.Services;
 using Hive.Services.Common;
