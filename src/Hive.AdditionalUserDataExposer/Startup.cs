@@ -15,9 +15,8 @@ namespace Hive.AdditionalUserDataExposer
 
         public void ConfigureServices(IServiceCollection services)
         {
-            _ = services
-                .AddSingleton<IUserPlugin, AdditionalUserDataExposerPlugin>()
-                .AddOptions<AdditionalUserDataExposerOptions>().Bind(Configuration);
+            var registration = services.AddSingleton<IUserPlugin, AdditionalUserDataExposerPlugin>();
+            _ = registration.AddOptions<AdditionalUserDataExposerOptions>().Bind(Configuration);
         }
     }
 }
