@@ -1,4 +1,4 @@
-# Permissions
+# Configuration
 
 Hive.Webhooks allows sending webhook events when certain events happen.
 
