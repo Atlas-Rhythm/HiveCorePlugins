@@ -26,7 +26,7 @@ namespace Hive.Tags.Extensions
         /// <param name="mod">The mod to extract tag information from.</param>
         /// <returns>The tags attached to a mod.</returns>
         public static IList<string>? GetTags(this Mod mod)
-            => mod is not null && mod.AdditionalData.TryGetValue<List<string>>(RolesAdditionalDataKey, out var tags)
+            => mod is not null && mod.AdditionalData.TryGetValue<List<string>>(TagsAdditionalDataKey, out var tags)
             ? tags
             : null;
 
