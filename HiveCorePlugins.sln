@@ -38,6 +38,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hive.PermissionQuery", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hive.Webhooks", "src\Hive.Webhooks\Hive.Webhooks.csproj", "{252F0961-543A-40D6-8C85-1823FD95A36C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hive.AdditionalUserDataExposer", "src\Hive.AdditionalUserDataExposer\Hive.AdditionalUserDataExposer.csproj", "{4CB8645F-0901-4D86-BAAD-D0E5E9ED6E64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +74,10 @@ Global
 		{252F0961-543A-40D6-8C85-1823FD95A36C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{252F0961-543A-40D6-8C85-1823FD95A36C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{252F0961-543A-40D6-8C85-1823FD95A36C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CB8645F-0901-4D86-BAAD-D0E5E9ED6E64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CB8645F-0901-4D86-BAAD-D0E5E9ED6E64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CB8645F-0901-4D86-BAAD-D0E5E9ED6E64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CB8645F-0901-4D86-BAAD-D0E5E9ED6E64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
