@@ -21,7 +21,7 @@ public class CategoryTagPlugin : ITagPlugin
             .Select(t => t[CategoryPrefix.Length..]);
 
         // If any of the provided tags are not in the category list, it's a fail.
-        if (currentTags.Any(t => _categoryOptions.Categories.Contains(t)))
+        if (!currentTags.Any(t => _categoryOptions.Categories.Contains(t)))
         {
             validationFailureInfo = "Unrecognized category tags";
             return false;
