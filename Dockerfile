@@ -13,6 +13,7 @@ RUN dotnet build -c Release -o
 
 # Copy project artifacts to a staging directory.
 # The Hive dockerfile will copy these plugins to its own image.
+# REVIEW: my docker experience is pretty minimal so im not sure if this is the best solution for this
 FROM build AS format-hive-plugins
 COPY ["artifacts/bin/Hive.AdditionalUserDataExposer/Release/net6.0/", "Plugins/Hive.AdditionalUserDataExposer/"]
 COPY ["artifacts/bin/Hive.FileSystemCdnProvider/Release/net6.0/", "Plugins/Hive.FileSystemCdnProvider/"]
