@@ -44,6 +44,7 @@ jobs:
             NUGET_USER_NAME=${{ github.repository_owner }}
             NUGET_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
           context: .
+          no-cache: true # this isnt ideal however caching causes the copy steps to fail
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
