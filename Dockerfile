@@ -7,13 +7,23 @@
 
 # Restore and build the project
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-RUN dotnet restore
+
+# Define build arguments to sign into GitHub Packages' NuGet repository
+ARG NUGET_USER_NAME
+ARG NUGET_AUTH_TOKEN
+
 COPY . .
-RUN dotnet build -c Release -o
+
+# Add GitHub Packages as a NuGet Source (this requires authentication!!)
+RUN dotnet nuget add source --username $NUGET_USER_NAME --password $NUGET_AUTH_TOKEN --store-password-in-clear-text --name github "https://nuget.pkg.github.com/Atlas-Rhythm/index.json"
+
+# Restore and build
+RUN dotnet restore
+RUN dotnet build -c Release
 
 # Copy project artifacts to a staging directory.
 # The Hive dockerfile will copy these plugins to its own image.
-# REVIEW: my docker experience is pretty minimal so im not sure if this is the best solution for this
+# REVIEW: my docker experience is pretty minimal so im not sure if this is the best solution for this.
 FROM build AS format-hive-plugins
 COPY ["artifacts/bin/Hive.AdditionalUserDataExposer/Release/net6.0/", "Plugins/Hive.AdditionalUserDataExposer/"]
 COPY ["artifacts/bin/Hive.FileSystemCdnProvider/Release/net6.0/", "Plugins/Hive.FileSystemCdnProvider/"]
