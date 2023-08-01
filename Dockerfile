@@ -23,12 +23,13 @@ RUN dotnet build -c Release
 
 # Copy project artifacts to a staging directory.
 # The Hive dockerfile will copy these plugins to its own image.
-# REVIEW: my docker experience is pretty minimal so im not sure if this is the best solution for this.
-COPY ["artifacts/bin/Hive.AdditionalUserDataExposer/Release/net6.0/", "Plugins/Hive.AdditionalUserDataExposer/"]
-COPY ["artifacts/bin/Hive.FileSystemCdnProvider/Release/net6.0/", "Plugins/Hive.FileSystemCdnProvider/"]
-COPY ["artifacts/bin/Hive.FileSystemRuleProvider/Release/net6.0/", "Plugins/Hive.FileSystemRuleProvider/"]
-COPY ["artifacts/bin/Hive.PermissionQuery/Release/net6.0/", "Plugins/Hive.PermissionQuery/"]
-COPY ["artifacts/bin/Hive.RateLimiting/Release/net6.0/", "Plugins/Hive.RateLimiting/"]
-COPY ["artifacts/bin/Hive.Tags/Release/net6.0/", "Plugins/Hive.Tags/"]
-COPY ["artifacts/bin/Hive.Tags.Categories/Release/net6.0/", "Plugins/Hive.Tags.Categories/"]
-COPY ["artifacts/bin/Hive.Webhooks/Release/net6.0/", "Plugins/Hive.Webhooks/"]
+# REVIEW: my docker experience is pretty minimal so im not sure if this is the best solution.
+FROM build AS final
+COPY --from=build "artifacts/bin/Hive.AdditionalUserDataExposer/Release/net6.0/" "Plugins/Hive.AdditionalUserDataExposer/"
+COPY --from=build "artifacts/bin/Hive.FileSystemCdnProvider/Release/net6.0/" "Plugins/Hive.FileSystemCdnProvider/"
+COPY --from=build "artifacts/bin/Hive.FileSystemRuleProvider/Release/net6.0/" "Plugins/Hive.FileSystemRuleProvider/"
+COPY --from=build "artifacts/bin/Hive.PermissionQuery/Release/net6.0/" "Plugins/Hive.PermissionQuery/"
+COPY --from=build "artifacts/bin/Hive.RateLimiting/Release/net6.0/" "Plugins/Hive.RateLimiting/"
+COPY --from=build "artifacts/bin/Hive.Tags/Release/net6.0/" "Plugins/Hive.Tags/"
+COPY --from=build "artifacts/bin/Hive.Tags.Categories/Release/net6.0/" "Plugins/Hive.Tags.Categories/"
+COPY --from=build "artifacts/bin/Hive.Webhooks/Release/net6.0/" "Plugins/Hive.Webhooks/"
